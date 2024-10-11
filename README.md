@@ -179,7 +179,7 @@ At a high level, the scheduler runs through the following steps
 
 <br>
 
-<div align="center"><img src="img/airflowoverviewprocess-w1121-h607.png" width=1121 height=607><br><sub>Airflow overview Process - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+<div align="center"><img src="img/airflowoverviewprocess-w1121-h607.png" width=1121 height=657><br><sub>Airflow overview Process - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
 <br>
    
