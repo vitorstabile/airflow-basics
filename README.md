@@ -6,7 +6,8 @@
     - [Chapter 1 - Part 1: What is Apache Airflow](#chapter1part1)
     - [Chapter 1 - Part 2: Benefits of Airflow](#chapter1part2)
     - [Chapter 1 - Part 3: Core Components of Airflow](#chapter1part3)
-    - [Chapter 1 - Part 4: Core Concepts of Airflow](#chapter1part4)
+    - [Chapter 1 - Part 4: Scheduling and executing pipelines](#chapter1part4)
+    - [Chapter 1 - Part 5: Core Concepts of Airflow](#chapter1part5)
 2. [Chapter 2: Development Environment](#chapter2)
     - [Chapter 2 - Part 1: Creating the Development Environment with Docker](#chapter2part1)
 
@@ -153,7 +154,36 @@ Airflow provides a flexible and scalable way to define and automate workflows, m
   - Example:
     - A worker processes a task that involves downloading a file from an external API and saving it to a local directory. Once the worker completes the task, it reports success, and the scheduler can trigger the next dependent task.
    
-#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Core Concepts of Airflow
+#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Scheduling and executing pipelines
+
+**Defining pipelines flexibly in (Python) code**
+
+In Airflow, you define your DAGs using Python code in DAG files, which are essentially Python scripts that describe the structure of the corresponding DAG. As such, each DAG file typically describes the set of tasks for a given DAG and the dependencies between the tasks, which are then parsed by Airflow to identify the DAG structure. Other than this, DAG files typically contain some additional metadata about the DAG telling Airflow how and when it should be executed, and so on. We’ll dive into this scheduling more in the next section.
+
+**Scheduling and executing pipelines**
+
+Once you’ve defined the structure of your pipeline(s) as DAG(s), Airflow allows you to define a schedule interval for each DAG, which determines exactly when your pipeline is run by Airflow. This way, you can tell Airflow to execute your DAG every hour, every day, every week, and so on, or even use more complicated schedule intervals based on Cron-like expressions.
+
+At a high level, Airflow is organized into three main components:
+
+- The Airflow scheduler—Parses DAGs, checks their schedule interval, and (if the DAGs’ schedule has passed) starts scheduling the DAGs’ tasks for execution by passing them to the Airflow workers.
+- The Airflow workers—Pick up tasks that are scheduled for execution and execute them. As such, the workers are responsible for actually “doing the work.”
+- The Airflow webserver—Visualizes the DAGs parsed by the scheduler and provides the main interface for users to monitor DAG runs and their results.
+
+At a high level, the scheduler runs through the following steps
+
+- Once users have written their workflows as DAGs, the files containing these DAGs are read by the scheduler to extract the corresponding tasks, dependencies, and schedule interval of each DAG.
+- For each DAG, the scheduler then checks whether the schedule interval for the DAG has passed since the last time it was read. If so, the tasks in the DAG are scheduled for execution.
+- For each scheduled task, the scheduler then checks whether the dependencies (= upstream tasks) of the task have been completed. If so, the task is added to the execution queue.
+- The scheduler waits for several moments before starting a new loop by jumping back to step 1.
+
+<br>
+
+<div align="center"><img src="img/airflowoverviewprocess-w1121-h607.png" width=1121 height=607><br><sub>Airflow overview Process - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+   
+#### <a name="chapter1part5"></a>Chapter 1 - Part 5: Core Concepts of Airflow
 
 **DAG (Directed Acyclic Grapsh)**
 
@@ -207,6 +237,19 @@ Because you have a loop. You can see that T4 depends on t1, t2, t3, but T1 also 
 <br>
 
 When the BashOperator runs, for example, in 1 of janary of 2024, it becomes a Task Instance (TI)
+
+**Tasks vs. operators**
+
+Operators provide the implementation of a piece of work. Airflow has a class called BaseOperator and many subclasses inheriting from the BaseOperator, such as PythonOperator, EmailOperator, and OracleOperator. Tasks in Airflow manage the execution of an operator;
+they can be thought of as a small wrapper or manager around an operator that ensures the operator executes correctly. The user can focus on the work to be done by using operators, while Airflow ensures correct execution of the work via tasks.
+
+- Operators define what a task does, while tasks are the actual instances of these actions that get executed within a DAG.
+- Operators are reusable templates, whereas tasks are tied to a specific workflow and its execution.
+
+- **Operator**: PythonOperator defines the action of running a Python function.
+- **Task**: When you assign the PythonOperator to a DAG, it becomes a task, like process_data_task, and represents the specific step of running that Python function in the workflow.
+
+Scheduling and executing pipelines
 
 ## <a name="chapter1"></a>Chapter 2: Development Environment
 
