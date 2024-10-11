@@ -155,7 +155,58 @@ Airflow provides a flexible and scalable way to define and automate workflows, m
    
 #### <a name="chapter1part4"></a>Chapter 1 - Part 4: Core Concepts of Airflow
 
-TODO
+**DAG (Directed Acyclic Grapsh)**
+
+- The Dag means directed acyclic graph, and a Dag is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies.
+- It helps you to define the structure of your entire workflow, showing which tasks needs to happen before others.
+- A Dag in airflow lists all the tasks to complete your data workflow in the right sequence.
+
+<br>
+
+<div align="center"><img src="img/dagexample-w527-h344.png" width=527 height=344><br><sub>Example of a DAG - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+You have four tasks T1, T2, T3, and T4. T4 depends on T1, T2, and T3.
+So you have those directed dependencies, and you know that in order to execute T4, because, T1, T2 and T3 need to run first.
+
+**You don't have any cycle in your graph in your Dag**
+
+<br>
+
+<div align="center"><img src="img/notdagexample-w527-h459.png" width=527 height=459><br><sub>Example of NOT a DAG - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+Because you have a loop. You can see that T4 depends on t1, t2, t3, but T1 also depends on T4. So you have a loop like an infinite loop. And this is not an acyclic graph.
+
+**Operator**
+
+- An operator defines a single, ideally idempotent task in your Dag (Idempotent means that you can run this task, this operator as many times as you want for the same input.)
+- Operators allow you to break down your workflow into discrete, manageable pieces of work.
+- Airflow has thousands of operators.
+  - The PythonOperator to execute a Python script or function.
+  - The BashOperator to execute a bash script, or command
+  - The SQLExecuteQueryOperator to execute a SQL query to a database
+  - The FileSensor to wait for a file
+ 
+**Task/Task Instance**
+
+- A task is a specific instance of an operator. When an operator is assigned to a Dag, it becomes a task.
+- Tasks are the actual units of work that get executed when your Dag runs.
+
+**Workflow**
+
+- A workflow is the entire process defined by your Dag, including all tasks and their dependencies.
+- It represents your entire data pipeline showing how all the pieces fit together to achieve your goal
+
+<br>
+
+<div align="center"><img src="img/workflow-w812-h762.png" width=812 height=762><br><sub>Example of a Workflow - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+When the BashOperator runs, for example, in 1 of janary of 2024, it becomes a Task Instance (TI)
 
 ## <a name="chapter1"></a>Chapter 2: Development Environment
 
