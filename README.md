@@ -47,7 +47,7 @@ Airflow provides a flexible and scalable way to define and automate workflows, m
 
 - **Machine Learning Pipelines**: Airflow can be used to automate and orchestrate complex machine learning workflows, from data preprocessing to model training and evaluation.
 
-#### <a name="chapter1part1"></a>Chapter 1 - Part 2: Benefits of Airflow
+#### <a name="chapter1part2"></a>Chapter 1 - Part 2: Benefits of Airflow
 
 **Dynamic**
 
