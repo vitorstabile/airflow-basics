@@ -6,6 +6,7 @@
     - [Chapter 1 - Part 1: What is Apache Airflow](#chapter1part1)
     - [Chapter 1 - Part 2: Benefits of Airflow](#chapter1part2)
     - [Chapter 1 - Part 3: Core Components of Airflow](#chapter1part3)
+    - [Chapter 1 - Part 4: Core Concepts of Airflow](#chapter1part4)
 2. [Chapter 2: Development Environment](#chapter2)
     - [Chapter 2 - Part 1: Creating the Development Environment with Docker](#chapter2part1)
 
@@ -151,3 +152,11 @@ Airflow provides a flexible and scalable way to define and automate workflows, m
   - Why it's useful: Workers are responsible for the actual execution of tasks. Without workers, tasks would not get executed, and DAGs would remain incomplete.
   - Example:
     - A worker processes a task that involves downloading a file from an external API and saving it to a local directory. Once the worker completes the task, it reports success, and the scheduler can trigger the next dependent task.
+   
+#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Core Concepts of Airflow
+
+TODO
+
+## <a name="chapter1"></a>Chapter 2: Development Environment
+
+#### <a name="chapter1part1"></a>Chapter 1 - Part 1: Creating the Development Environment with Docker
