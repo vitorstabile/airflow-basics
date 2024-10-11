@@ -8,6 +8,8 @@
     - [Chapter 1 - Part 3: Core Components of Airflow](#chapter1part3)
     - [Chapter 1 - Part 4: Scheduling and executing pipelines](#chapter1part4)
     - [Chapter 1 - Part 5: Core Concepts of Airflow](#chapter1part5)
+    - [Chapter 1 - Part 6: The Different Architectures to run Airflow](#chapter1part6)
+    - [Chapter 1 - Part 7: Reasons not to choose Airflow](#chapter1part7)
 2. [Chapter 2: Development Environment](#chapter2)
     - [Chapter 2 - Part 1: Creating the Development Environment with Docker](#chapter2part1)
 
@@ -250,6 +252,75 @@ they can be thought of as a small wrapper or manager around an operator that ens
 - **Task**: When you assign the PythonOperator to a DAG, it becomes a task, like process_data_task, and represents the specific step of running that Python function in the workflow.
 
 Scheduling and executing pipelines
+
+#### <a name="chapter1part6"></a>Chapter 1 - Part 6: The Different Architectures
+
+Airflow can run in both single-node and multi-node setups, with each setup having distinct architectural differences. Here's a breakdown of each architecture:
+
+**Single-Node Airflow Architecture**
+
+- In a single-node setup, all Airflow components (Webserver, Scheduler, Metadata Database, and Worker) run on a single machine.
+- This is typically used for small-scale deployments, testing, or development environments.
+- Core Components:
+  - Webserver:
+    - The web-based user interface (UI) where you can monitor DAGs, view logs, and manage tasks.
+    - In a single-node setup, it runs on the same machine as the other components.
+  - Scheduler:
+    - Responsible for scheduling DAG runs and ensuring tasks are executed based on their defined schedule intervals.
+    - In a single-node architecture, the scheduler runs on the same machine as the webserver and workers.
+  - Metadata Database:
+    - Stores metadata about DAGs, tasks, and their execution history. Airflow uses databases like MySQL or PostgreSQL.
+    - The metadata database is hosted locally on the same machine in this setup.
+  - Worker:
+    - Executes the actual tasks of the DAG. The tasks are processed in parallel using the machine's available resources.
+    - In a single-node setup, there is only one worker, which runs on the same machine as all other components.
+
+- Positve:
+  - Simpler to manage: All components are on one machine, making it easier to deploy, set up, and troubleshoot.
+  - Good for development: Perfect for development or small-scale workflows, where scaling or distributed execution isn’t required.
+- Limitations:
+  - Limited scalability: A single machine can only handle so many tasks simultaneously due to hardware constraints.
+  - Single point of failure: If the machine goes down, all Airflow services stop.
+ 
+**Multi-Node Airflow Architecture**
+
+- In a multi-node setup, Airflow components are distributed across different machines. This allows Airflow to handle larger workloads by running multiple workers across multiple machines.
+- This is typically used in production environments where high availability, fault tolerance, and scalability are critical.
+- Core Components:
+  - Webserver (Single Instance):
+    - The user interface remains centralized and usually runs on a dedicated machine, allowing users to monitor workflows.
+    - The Webserver is stateless, so it can run independently without being involved in task execution.
+  - Scheduler (Single Instance or Highly Available Mode):
+    - The Scheduler is responsible for queuing tasks. In a multi-node setup, it runs separately from workers.
+    - In larger setups, you might also set up a highly available mode with multiple schedulers running in active/passive mode to prevent any single point of failure.
+  - Metadata Database (Single Instance):
+    - The centralized database that tracks the state of the tasks and DAGs.
+    - This is usually hosted on a dedicated machine and can be scaled separately using database replication techniques.
+  - Worker (Multiple Instances):
+    - Workers are distributed across different machines (nodes), allowing them to execute tasks in parallel, thereby increasing the processing capacity.
+    - Workers pull tasks from the task queue and execute them. This multi-node worker setup allows you to scale the number of workers based on the workload.
+    - You can use distributed systems like Celery or Kubernetes to manage these workers.
+  - Message Broker (e.g., RabbitMQ, Redis):
+    - In a multi-node setup, tasks are queued in a message broker (like RabbitMQ or Redis) to distribute the load among the workers.
+    - The message broker ensures communication between the Scheduler and the distributed Workers.
+
+- Positive:
+  - Scalability: You can add more worker nodes to handle an increasing workload without overwhelming a single machine.
+  - Fault Tolerance: If one worker node fails, other worker nodes can continue processing tasks, increasing system reliability.
+  - Performance: By distributing tasks across multiple machines, you can process workflows faster, improving throughput.
+- Limitations:
+  - Complexity: Multi-node setups require more configuration and maintenance. Setting up and monitoring multiple nodes and components adds overhead.
+  - Resource Intensive: You’ll need to allocate more resources (multiple machines or cloud instances) to manage the infrastructure.
+ 
+  **Use Case Scenarios**
+
+- Single-node: Suitable for small development environments where workflows and tasks are minimal and don't require much scalability.
+- Multi-node: Ideal for production environments with large-scale data pipelines, high availability needs, and distributed task execution requirements.
+
+#### <a name="chapter1part7"></a>Chapter 1 - Part 7: Reasons not to choose Airflow
+
+- Handling streaming pipelines, as Airflow is primarily designed to run recurring or batch-oriented tasks, rather than streaming workloads.
+- Implementing highly dynamic pipelines, in which tasks are added/removed between every pipeline run. Although Airflow can implement this kind of dynamic behavior, the web interface will only show tasks that are still defined in the most recent version of the DAG. As such, Airflow favors pipelines that do not change in structure every time they run.
 
 ## <a name="chapter1"></a>Chapter 2: Development Environment
 
