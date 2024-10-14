@@ -469,7 +469,7 @@ d8a039bfdf66   redis:latest           "docker-entrypoint.s…"   53 seconds ago 
 
 <br>
 
-<div align="center"><img src="img/airflowuipage-w1913-h440" width=1913 height=440><br><sub>Airflow Log In Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+<div align="center"><img src="img/airflowuipage-w1913-h440.png" width=1913 height=440><br><sub>Airflow Log In Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
 <br>
 
@@ -477,6 +477,6 @@ d8a039bfdf66   redis:latest           "docker-entrypoint.s…"   53 seconds ago 
 
 <br>
 
-<div align="center"><img src="img/airflowuipage2-w1913-h417" width=1913 height=417><br><sub>Airflow Dags Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+<div align="center"><img src="img/airflowuipage2-w1913-h417.png" width=1913 height=417><br><sub>Airflow Dags Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
 <br>
