@@ -11,7 +11,8 @@
     - [Chapter 1 - Part 6: The Different Architectures to run Airflow](#chapter1part6)
     - [Chapter 1 - Part 7: Reasons not to choose Airflow](#chapter1part7)
 2. [Chapter 2: Development Environment](#chapter2)
-    - [Chapter 2 - Part 1: Creating the Development Environment with Docker](#chapter2part1)
+    - [Chapter 2 - Part 1: Creating the Development Environment](#chapter2part1)
+    - [Chapter 2 - Part 2: Init Apache Airflow with Docker](#chapter2part2)
 
 ## <a name="chapter1"></a>Chapter 1: Introduction to Airflow
 
@@ -412,3 +413,70 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
   - ```sudo curl -L "https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose```
   - ```sudo chmod +x /usr/local/bin/docker-compose```
   - ```docker-compose --version```
+
+#### <a name="chapter2part2"></a>Chapter 2 - Part 2: Init Apache Airflow with Docker
+
+- Create the project folder (E.g:C:\Workspace\airflow-tutorial)
+- Create a python virtual enviroment in this folder (If Windows ```python -m venv venv```, if Linux ```python3 -m venv venv```)
+- Active the virtual enviroment (If Windows ```.\venv\Scripts\activate```, if Linux ```source venv/bin/activate````)
+- Download the ```docker compose file``` and the ```.env``` file that is in this [folder](https://github.com/vitorstabile/airflow-basics/tree/main/docker-image)
+- Save the ```docker compose file``` and the ```.env``` in the project folder
+- Go to the project folder, open the cmd or terminal and make ```docker-compose up -d```
+- You will see somenthing like this
+
+```
+WARN[0000] The "AIRFLOW_UID" variable is not set. Defaulting to a blank string.
+WARN[0000] The "AIRFLOW_UID" variable is not set. Defaulting to a blank string.
+WARN[0000] /mnt/c/Workspace/airflow-tutorial/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 0/6
+ ⠙ airflow-worker Pulling                                                                                          8.2s
+ ⠙ redis Pulling                                                                                                   8.2s
+ ⠙ airflow-webserver Pulling                                                                                       8.2s
+ ⠙ airflow-scheduler Pulling                                                                                       8.2s
+ ⠙ airflow-init Pulling                                                                                            8.2s
+ ⠙ airflow-triggerer Pulling                                                                                       8.2s
+```
+
+- You will see many lines scrolled, wait until it's done. Docker is downloading Airflow to run it. It can take up to 5 mins depending on your connection. If Docker raises an error saying it can't download the docker image, ensure you are not behind a proxy/vpn or corporate network. You may need to use your personal connection to make it work. At the end, you should end up with something like this
+
+```
+ ✔ Network airflow-tutorial_default                Created                                                         0.0s
+ ✔ Volume "airflow-tutorial_postgres-db-volume"    Created                                                         0.0s
+ ✔ Container airflow-tutorial-postgres-1           Healthy                                                         6.9s
+ ✔ Container airflow-tutorial-redis-1              Healthy                                                         6.9s
+ ✔ Container airflow-tutorial-airflow-init-1       Exited                                                         21.0s
+ ✔ Container airflow-tutorial-airflow-scheduler-1  Started                                                        21.8s
+ ✔ Container airflow-tutorial-airflow-worker-1     Started                                                        21.8s
+ ✔ Container airflow-tutorial-airflow-webserver-1  Started                                                        21.8s
+ ✔ Container airflow-tutorial-airflow-triggerer-1  Started                                                        21.8s
+```
+
+- If you make a ```docker ps```, you will see this
+
+```
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS                    PORTS                                       NAMES
+22c09aea6657   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   airflow-tutorial-airflow-webserver-1
+43a661ab5fda   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp
+                              airflow-tutorial-airflow-triggerer-1
+a7b13dd3fbbe   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp                                    airflow-tutorial-airflow-scheduler-1
+763381cd5116   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp                                    airflow-tutorial-airflow-worker-1
+d8a039bfdf66   redis:latest           "docker-entrypoint.s…"   53 seconds ago   Up 52 seconds (healthy)   6379/tcp                                    airflow-tutorial-redis-1
+```
+
+- This means, that everthing is ok. Now, open your browser and enter the page ```http://localhost:8080```
+
+- You will enter in the Airflow log in page. Put ```airflow``` as username and password
+
+<br>
+
+<div align="center"><img src="img/airflowuipage-w1913-h440" width=1913 height=440><br><sub>Airflow Log In Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+- Now, you you have the DAGs page
+
+<br>
+
+<div align="center"><img src="img/airflowuipage2-w1913-h417" width=1913 height=417><br><sub>Airflow Dags Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
