@@ -325,3 +325,76 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
 ## <a name="chapter1"></a>Chapter 2: Development Environment
 
 #### <a name="chapter1part1"></a>Chapter 1 - Part 1: Creating the Development Environment with Docker
+
+**Development Environment Setup on Windows**
+
+1 - Install Python on Windows
+  - Download the latest version of Python from the official Python website.
+  - During installation
+    - Check the box "Add Python to PATH".
+    - Select the option to install for all users and install Python.
+    - Verify Python installation by opening Command Prompt and typing
+    - ```python --version```
+  - Install pip (Python’s package installer)
+    - If pip isn't installed automatically, you can manually install it
+    - ```python -m ensurepip --upgrade```
+2 -  Install Virtual Environment (venv)
+  - Create a virtual environment to isolate your Python dependencies
+    - Open Command Prompt or PowerShell
+    - Navigate to your project directory
+    - ```cd path\to\your\project```
+    - Create a virtual environment using venv
+    - ```python -m venv venv```
+    - Activate the virtual environment
+    - ```.\venv\Scripts\activate```
+3 - Install Python Packages
+  - Once the virtual environment is activated, you can install necessary packages using pip
+    - If you have a requirements.txt file, you can install all required packages
+    - ```pip install -r requirements.txt```
+    - Otherwise, install packages manually (e.g., Airflow)
+    - ```pip install apache-airflow```
+4 - Install Docker
+  - Download and install Docker Desktop for Windows from the official Docker website
+  - After installation, verify Docker is running by typing in Command Prompt or PowerShell
+  - ```docker --version```
+  - To use Docker Compose, ensure it is installed by default with Docker Desktop
+  - ```docker-compose --version```
+
+
+**Development Environment Setup on Linux**
+
+1 - Install Python on Linux
+  - Update the system.
+  - ```sudo apt update && sudo apt upgrade```
+  - Install Python (if not already installed)
+  - ```sudo apt install python3 python3-pip python3-venv```
+  - Verify installation
+  - ```python3 --version```
+  - ```pip3 --version```
+2 -  Install Virtual Environment (venv)
+  - Create a virtual environment to isolate your Python dependencies
+    - Navigate to your project directory
+    - ```cd ~/path/to/your/project```
+    - Create a virtual environment using venv
+    - ```python3 -m venv venv```
+    - Activate the virtual environment
+    - ```source venv/bin/activate```
+3 - Install Python Packages
+  - Once the virtual environment is activated, you can install necessary packages using pip
+    - If you have a requirements.txt file, you can install all required packages
+    - ```pip install -r requirements.txt```
+    - Otherwise, install packages manually (e.g., Airflow)
+    - ```pip install apache-airflow```
+4 - Install Docker
+  - Update system and install Docker
+  - ```sudo apt update```
+  - ```sudo apt install docker.io```
+  - Start and enable Docker
+  - ```sudo systemctl start docker```
+  - ```sudo systemctl enable docker```
+  - Verify Docker installation
+  - ```docker --version```
+  - Install Docker Compose
+  - ```sudo curl -L "https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose```
+  - ```sudo chmod +x /usr/local/bin/docker-compose```
+  - ```docker-compose --version```
