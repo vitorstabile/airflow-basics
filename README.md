@@ -329,6 +329,7 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
 **Development Environment Setup on Windows**
 
 1 Install Python on Windows
+
   - Download the latest version of Python from the official Python website.
   - During installation
     - Check the box "Add Python to PATH".
@@ -338,7 +339,9 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
   - Install pip (Python’s package installer)
     - If pip isn't installed automatically, you can manually install it
     - ```python -m ensurepip --upgrade```
+
 2 Install Virtual Environment (venv)
+
   - Create a virtual environment to isolate your Python dependencies
     - Open Command Prompt or PowerShell
     - Navigate to your project directory
@@ -347,13 +350,17 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
     - ```python -m venv venv```
     - Activate the virtual environment
     - ```.\venv\Scripts\activate```
+
 3 Install Python Packages
+
   - Once the virtual environment is activated, you can install necessary packages using pip
     - If you have a requirements.txt file, you can install all required packages
     - ```pip install -r requirements.txt```
     - Otherwise, install packages manually (e.g., Airflow)
     - ```pip install apache-airflow```
+
 4 Install Docker
+
   - Download and install Docker Desktop for Windows from the official Docker website
   - After installation, verify Docker is running by typing in Command Prompt or PowerShell
   - ```docker --version```
@@ -364,6 +371,7 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
 **Development Environment Setup on Linux**
 
 1 Install Python on Linux
+
   - Update the system.
   - ```sudo apt update && sudo apt upgrade```
   - Install Python (if not already installed)
@@ -371,7 +379,9 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
   - Verify installation
   - ```python3 --version```
   - ```pip3 --version```
+
 2 Install Virtual Environment (venv)
+
   - Create a virtual environment to isolate your Python dependencies
     - Navigate to your project directory
     - ```cd ~/path/to/your/project```
@@ -379,13 +389,17 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
     - ```python3 -m venv venv```
     - Activate the virtual environment
     - ```source venv/bin/activate```
+
 3 Install Python Packages
+
   - Once the virtual environment is activated, you can install necessary packages using pip
     - If you have a requirements.txt file, you can install all required packages
     - ```pip install -r requirements.txt```
     - Otherwise, install packages manually (e.g., Airflow)
     - ```pip install apache-airflow```
+
 4 Install Docker
+
   - Update system and install Docker
   - ```sudo apt update```
   - ```sudo apt install docker.io```
