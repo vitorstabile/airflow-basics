@@ -322,9 +322,9 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
 - Handling streaming pipelines, as Airflow is primarily designed to run recurring or batch-oriented tasks, rather than streaming workloads.
 - Implementing highly dynamic pipelines, in which tasks are added/removed between every pipeline run. Although Airflow can implement this kind of dynamic behavior, the web interface will only show tasks that are still defined in the most recent version of the DAG. As such, Airflow favors pipelines that do not change in structure every time they run.
 
-## <a name="chapter1"></a>Chapter 2: Development Environment
+## <a name="chapter2"></a>Chapter 2: Development Environment
 
-#### <a name="chapter1part1"></a>Chapter 1 - Part 1: Creating the Development Environment with Docker
+#### <a name="chapter2part1"></a>Chapter 2 - Part 1: Creating the Development Environment with Docker
 
 **Development Environment Setup on Windows**
 
