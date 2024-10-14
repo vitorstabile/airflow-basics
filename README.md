@@ -13,6 +13,8 @@
 2. [Chapter 2: Development Environment](#chapter2)
     - [Chapter 2 - Part 1: Creating the Development Environment](#chapter2part1)
     - [Chapter 2 - Part 2: Init Apache Airflow with Docker](#chapter2part2)
+3. [Chapter 3: Data Pipeline with Airflow](#chapter3)
+    - [Chapter 3 - Part 1: The Project](#chapter3part1)
 
 ## <a name="chapter1"></a>Chapter 1: Introduction to Airflow
 
@@ -480,3 +482,8 @@ d8a039bfdf66   redis:latest           "docker-entrypoint.s…"   53 seconds ago 
 <div align="center"><img src="img/airflowuipage2-w1913-h417.png" width=1913 height=417><br><sub>Airflow Dags Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
 <br>
+
+## <a name="chapter3"></a>Chapter 3: Data Pipeline with Airflow
+
+#### <a name="chapter3part1"></a>Chapter 3 - Part 1: The Project
+
