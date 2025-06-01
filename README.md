@@ -309,10 +309,92 @@ Docker Compose is a tool for defining and running multi-container Docker applica
 
 #### <a name="chapter1part4.2"></a>Chapter 1 - Part 4.2: Prerequisites
 
-Before you begin, ensure you have the following installed:
+**Development Environment Setup on Windows**
 
-- **Docker**: Docker is the core technology for containerization. You can download and install Docker Desktop from the official Docker website: https://www.docker.com/products/docker-desktop/
-- **Docker Compose**: Docker Compose is used to define and manage multi-container applications. Docker Compose is included with Docker Desktop. Verify the installation by running docker-compose --version in your terminal.
+1 Install Python on Windows
+
+  - Download the latest version of Python from the official Python website.
+  - During installation
+    - Check the box "Add Python to PATH".
+    - Select the option to install for all users and install Python.
+    - Verify Python installation by opening Command Prompt and typing
+    - ```python --version```
+  - Install pip (Python’s package installer)
+    - If pip isn't installed automatically, you can manually install it
+    - ```python -m ensurepip --upgrade```
+
+2 Install Virtual Environment (venv)
+
+  - Create a virtual environment to isolate your Python dependencies
+    - Open Command Prompt or PowerShell
+    - Navigate to your project directory
+    - ```cd path\to\your\project```
+    - Create a virtual environment using venv
+    - ```python -m venv venv```
+    - Activate the virtual environment
+    - ```.\venv\Scripts\activate```
+
+3 Install Python Packages
+
+  - Once the virtual environment is activated, you can install necessary packages using pip
+    - If you have a requirements.txt file, you can install all required packages
+    - ```pip install -r requirements.txt```
+    - Otherwise, install packages manually (e.g., Airflow)
+    - ```pip install apache-airflow```
+
+4 Install Docker
+
+  - Download and install Docker Desktop for Windows from the official Docker website
+  - After installation, verify Docker is running by typing in Command Prompt or PowerShell
+  - ```docker --version```
+  - To use Docker Compose, ensure it is installed by default with Docker Desktop
+  - ```docker-compose --version```
+
+
+**Development Environment Setup on Linux**
+
+1 Install Python on Linux
+
+  - Update the system.
+  - ```sudo apt update && sudo apt upgrade```
+  - Install Python (if not already installed)
+  - ```sudo apt install python3 python3-pip python3-venv```
+  - Verify installation
+  - ```python3 --version```
+  - ```pip3 --version```
+
+2 Install Virtual Environment (venv)
+
+  - Create a virtual environment to isolate your Python dependencies
+    - Navigate to your project directory
+    - ```cd ~/path/to/your/project```
+    - Create a virtual environment using venv
+    - ```python3 -m venv venv```
+    - Activate the virtual environment
+    - ```source venv/bin/activate```
+
+3 Install Python Packages
+
+  - Once the virtual environment is activated, you can install necessary packages using pip
+    - If you have a requirements.txt file, you can install all required packages
+    - ```pip install -r requirements.txt```
+    - Otherwise, install packages manually (e.g., Airflow)
+    - ```pip install apache-airflow```
+
+4 Install Docker
+
+  - Update system and install Docker
+  - ```sudo apt update```
+  - ```sudo apt install docker.io```
+  - Start and enable Docker
+  - ```sudo systemctl start docker```
+  - ```sudo systemctl enable docker```
+  - Verify Docker installation
+  - ```docker --version```
+  - Install Docker Compose
+  - ```sudo curl -L "https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose```
+  - ```sudo chmod +x /usr/local/bin/docker-compose```
+  - ```docker-compose --version```
 
 #### <a name="chapter1part4.3"></a>Chapter 1 - Part 4.3: Setting Up Airflow with Docker Compose
 
@@ -627,6 +709,10 @@ mkdir airflow-docker-setup
 cd airflow-docker-setup
 ```
 
+- **Create a python virtual enviroment in this folder** (If Windows ```python -m venv venv```, if Linux ```python3 -m venv venv```)
+
+- **Active the virtual enviroment** (If Windows ```.\venv\Scripts\activate```, if Linux ```source venv/bin/activate````)
+
 - **Save the Docker Compose File**: Save the provided docker-compose.yaml file into this directory.
 
 - **Create .env File (Optional)**: You can create a .env file to override the default environment variables. This is useful for setting your own passwords, user IDs, or Airflow image version.
@@ -634,9 +720,8 @@ cd airflow-docker-setup
 Here’s an example .env file:
 
 ```
+AIRFLOW_IMAGE_NAME=apache/airflow:2.4.2
 AIRFLOW_UID=50000
-_AIRFLOW_WWW_USER_USERNAME=admin
-_AIRFLOW_WWW_USER_PASSWORD=admin
 ```
 
 - **Directory Structure**: Create dags, logs, and plugins folders.
@@ -654,6 +739,64 @@ docker-compose up -d
 ```
 
 This command will download the necessary images and start the containers in detached mode.
+
+```
+WARN[0000] The "AIRFLOW_UID" variable is not set. Defaulting to a blank string.
+WARN[0000] The "AIRFLOW_UID" variable is not set. Defaulting to a blank string.
+WARN[0000] /mnt/c/Workspace/airflow-tutorial/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
+[+] Running 0/6
+ ⠙ airflow-worker Pulling                                                                                          8.2s
+ ⠙ redis Pulling                                                                                                   8.2s
+ ⠙ airflow-webserver Pulling                                                                                       8.2s
+ ⠙ airflow-scheduler Pulling                                                                                       8.2s
+ ⠙ airflow-init Pulling                                                                                            8.2s
+ ⠙ airflow-triggerer Pulling                                                                                       8.2s
+```
+
+- You will see many lines scrolled, wait until it's done. Docker is downloading Airflow to run it. It can take up to 5 mins depending on your connection. If Docker raises an error saying it can't download the docker image, ensure you are not behind a proxy/vpn or corporate network. You may need to use your personal connection to make it work. At the end, you should end up with something like this
+
+```
+ ✔ Network airflow-tutorial_default                Created                                                         0.0s
+ ✔ Volume "airflow-tutorial_postgres-db-volume"    Created                                                         0.0s
+ ✔ Container airflow-tutorial-postgres-1           Healthy                                                         6.9s
+ ✔ Container airflow-tutorial-redis-1              Healthy                                                         6.9s
+ ✔ Container airflow-tutorial-airflow-init-1       Exited                                                         21.0s
+ ✔ Container airflow-tutorial-airflow-scheduler-1  Started                                                        21.8s
+ ✔ Container airflow-tutorial-airflow-worker-1     Started                                                        21.8s
+ ✔ Container airflow-tutorial-airflow-webserver-1  Started                                                        21.8s
+ ✔ Container airflow-tutorial-airflow-triggerer-1  Started                                                        21.8s
+```
+
+- If you make a ```docker ps```, you will see this
+
+```
+CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS                    PORTS                                       NAMES
+22c09aea6657   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   airflow-tutorial-airflow-webserver-1
+43a661ab5fda   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp
+                              airflow-tutorial-airflow-triggerer-1
+a7b13dd3fbbe   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp                                    airflow-tutorial-airflow-scheduler-1
+763381cd5116   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp                                    airflow-tutorial-airflow-worker-1
+d8a039bfdf66   redis:latest           "docker-entrypoint.s…"   53 seconds ago   Up 52 seconds (healthy)   6379/tcp                                    airflow-tutorial-redis-1
+```
+
+- This means, that everthing is ok. Now, open your browser and enter the page ```http://localhost:8080```
+
+- You will enter in the Airflow log in page. Put ```airflow``` as username and password
+
+<br>
+
+<div align="center"><img src="img/airflowuipage-w1913-h440.png" width=1913 height=440><br><sub>Airflow Log In Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+- Now, you you have the DAGs page
+
+<br>
+
+<div align="center"><img src="img/airflowuipage2-w1913-h417.png" width=1913 height=417><br><sub>Airflow Dags Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
 
 - **Check the Status**: Verify that all containers are running correctly.
 
@@ -726,191 +869,3 @@ Using SQLite is generally not recommended for production environments due to its
 #### <a name="chapter1part5.2"></a>Chapter 1 - Part 5.2: Key Components of the Airflow UI
 
 #### <a name="chapter1part5.3"></a>Chapter 1 - Part 5.3: Using the Airflow UI for Monitoring and Troubleshooting
-
-#### <a name="chapter1part5.4"></a>Chapter 1 - Part 5.4: Practice Activities
-
-
-
-#### <a name="chapter1part3"></a>Chapter 1 - Part 3: Core Components of Airflow
-
-
-   
-#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Scheduling and executing pipelines
-
-
-   
-#### <a name="chapter1part5"></a>Chapter 1 - Part 5: Core Concepts of Airflow
-
-
-
-#### <a name="chapter1part6"></a>Chapter 1 - Part 6: The Different Architectures
-
-
-
-#### <a name="chapter1part7"></a>Chapter 1 - Part 7: Reasons not to choose Airflow
-
-- Handling streaming pipelines, as Airflow is primarily designed to run recurring or batch-oriented tasks, rather than streaming workloads.
-- Implementing highly dynamic pipelines, in which tasks are added/removed between every pipeline run. Although Airflow can implement this kind of dynamic behavior, the web interface will only show tasks that are still defined in the most recent version of the DAG. As such, Airflow favors pipelines that do not change in structure every time they run.
-
-## <a name="chapter2"></a>Chapter 2: Development Environment
-
-#### <a name="chapter2part1"></a>Chapter 2 - Part 1: Creating the Development Environment with Docker
-
-**Development Environment Setup on Windows**
-
-1 Install Python on Windows
-
-  - Download the latest version of Python from the official Python website.
-  - During installation
-    - Check the box "Add Python to PATH".
-    - Select the option to install for all users and install Python.
-    - Verify Python installation by opening Command Prompt and typing
-    - ```python --version```
-  - Install pip (Python’s package installer)
-    - If pip isn't installed automatically, you can manually install it
-    - ```python -m ensurepip --upgrade```
-
-2 Install Virtual Environment (venv)
-
-  - Create a virtual environment to isolate your Python dependencies
-    - Open Command Prompt or PowerShell
-    - Navigate to your project directory
-    - ```cd path\to\your\project```
-    - Create a virtual environment using venv
-    - ```python -m venv venv```
-    - Activate the virtual environment
-    - ```.\venv\Scripts\activate```
-
-3 Install Python Packages
-
-  - Once the virtual environment is activated, you can install necessary packages using pip
-    - If you have a requirements.txt file, you can install all required packages
-    - ```pip install -r requirements.txt```
-    - Otherwise, install packages manually (e.g., Airflow)
-    - ```pip install apache-airflow```
-
-4 Install Docker
-
-  - Download and install Docker Desktop for Windows from the official Docker website
-  - After installation, verify Docker is running by typing in Command Prompt or PowerShell
-  - ```docker --version```
-  - To use Docker Compose, ensure it is installed by default with Docker Desktop
-  - ```docker-compose --version```
-
-
-**Development Environment Setup on Linux**
-
-1 Install Python on Linux
-
-  - Update the system.
-  - ```sudo apt update && sudo apt upgrade```
-  - Install Python (if not already installed)
-  - ```sudo apt install python3 python3-pip python3-venv```
-  - Verify installation
-  - ```python3 --version```
-  - ```pip3 --version```
-
-2 Install Virtual Environment (venv)
-
-  - Create a virtual environment to isolate your Python dependencies
-    - Navigate to your project directory
-    - ```cd ~/path/to/your/project```
-    - Create a virtual environment using venv
-    - ```python3 -m venv venv```
-    - Activate the virtual environment
-    - ```source venv/bin/activate```
-
-3 Install Python Packages
-
-  - Once the virtual environment is activated, you can install necessary packages using pip
-    - If you have a requirements.txt file, you can install all required packages
-    - ```pip install -r requirements.txt```
-    - Otherwise, install packages manually (e.g., Airflow)
-    - ```pip install apache-airflow```
-
-4 Install Docker
-
-  - Update system and install Docker
-  - ```sudo apt update```
-  - ```sudo apt install docker.io```
-  - Start and enable Docker
-  - ```sudo systemctl start docker```
-  - ```sudo systemctl enable docker```
-  - Verify Docker installation
-  - ```docker --version```
-  - Install Docker Compose
-  - ```sudo curl -L "https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose```
-  - ```sudo chmod +x /usr/local/bin/docker-compose```
-  - ```docker-compose --version```
-
-#### <a name="chapter2part2"></a>Chapter 2 - Part 2: Init Apache Airflow with Docker
-
-- Create the project folder (E.g:C:\Workspace\airflow-tutorial)
-- Create a python virtual enviroment in this folder (If Windows ```python -m venv venv```, if Linux ```python3 -m venv venv```)
-- Active the virtual enviroment (If Windows ```.\venv\Scripts\activate```, if Linux ```source venv/bin/activate````)
-- Download the ```docker compose file``` and the ```.env``` file that is in this [folder](https://github.com/vitorstabile/airflow-basics/tree/main/docker-image)
-- Save the ```docker compose file``` and the ```.env``` in the project folder
-- Go to the project folder, open the cmd or terminal and make ```docker-compose up -d```
-- You will see somenthing like this
-
-```
-WARN[0000] The "AIRFLOW_UID" variable is not set. Defaulting to a blank string.
-WARN[0000] The "AIRFLOW_UID" variable is not set. Defaulting to a blank string.
-WARN[0000] /mnt/c/Workspace/airflow-tutorial/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion
-[+] Running 0/6
- ⠙ airflow-worker Pulling                                                                                          8.2s
- ⠙ redis Pulling                                                                                                   8.2s
- ⠙ airflow-webserver Pulling                                                                                       8.2s
- ⠙ airflow-scheduler Pulling                                                                                       8.2s
- ⠙ airflow-init Pulling                                                                                            8.2s
- ⠙ airflow-triggerer Pulling                                                                                       8.2s
-```
-
-- You will see many lines scrolled, wait until it's done. Docker is downloading Airflow to run it. It can take up to 5 mins depending on your connection. If Docker raises an error saying it can't download the docker image, ensure you are not behind a proxy/vpn or corporate network. You may need to use your personal connection to make it work. At the end, you should end up with something like this
-
-```
- ✔ Network airflow-tutorial_default                Created                                                         0.0s
- ✔ Volume "airflow-tutorial_postgres-db-volume"    Created                                                         0.0s
- ✔ Container airflow-tutorial-postgres-1           Healthy                                                         6.9s
- ✔ Container airflow-tutorial-redis-1              Healthy                                                         6.9s
- ✔ Container airflow-tutorial-airflow-init-1       Exited                                                         21.0s
- ✔ Container airflow-tutorial-airflow-scheduler-1  Started                                                        21.8s
- ✔ Container airflow-tutorial-airflow-worker-1     Started                                                        21.8s
- ✔ Container airflow-tutorial-airflow-webserver-1  Started                                                        21.8s
- ✔ Container airflow-tutorial-airflow-triggerer-1  Started                                                        21.8s
-```
-
-- If you make a ```docker ps```, you will see this
-
-```
-CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS                    PORTS                                       NAMES
-22c09aea6657   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   airflow-tutorial-airflow-webserver-1
-43a661ab5fda   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp
-                              airflow-tutorial-airflow-triggerer-1
-a7b13dd3fbbe   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp                                    airflow-tutorial-airflow-scheduler-1
-763381cd5116   apache/airflow:2.5.1   "/usr/bin/dumb-init …"   53 seconds ago   Up 31 seconds (healthy)   8080/tcp                                    airflow-tutorial-airflow-worker-1
-d8a039bfdf66   redis:latest           "docker-entrypoint.s…"   53 seconds ago   Up 52 seconds (healthy)   6379/tcp                                    airflow-tutorial-redis-1
-```
-
-- This means, that everthing is ok. Now, open your browser and enter the page ```http://localhost:8080```
-
-- You will enter in the Airflow log in page. Put ```airflow``` as username and password
-
-<br>
-
-<div align="center"><img src="img/airflowuipage-w1913-h440.png" width=1913 height=440><br><sub>Airflow Log In Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
-
-<br>
-
-- Now, you you have the DAGs page
-
-<br>
-
-<div align="center"><img src="img/airflowuipage2-w1913-h417.png" width=1913 height=417><br><sub>Airflow Dags Page - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
-
-<br>
-
-## <a name="chapter3"></a>Chapter 3: Data Pipeline with Airflow
-
-#### <a name="chapter3part1"></a>Chapter 3 - Part 1: The Project
-
