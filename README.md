@@ -2,90 +2,183 @@
 
 # Content
 
-1. [Chapter 1: Introduction to Airflow](#chapter1)
-    - [Chapter 1 - Part 1: What is Apache Airflow](#chapter1part1)
-    - [Chapter 1 - Part 2: Benefits of Airflow](#chapter1part2)
-    - [Chapter 1 - Part 3: Core Components of Airflow](#chapter1part3)
-    - [Chapter 1 - Part 4: Scheduling and executing pipelines](#chapter1part4)
-    - [Chapter 1 - Part 5: Core Concepts of Airflow](#chapter1part5)
-    - [Chapter 1 - Part 6: The Different Architectures to run Airflow](#chapter1part6)
-    - [Chapter 1 - Part 7: Reasons not to choose Airflow](#chapter1part7)
-2. [Chapter 2: Development Environment](#chapter2)
-    - [Chapter 2 - Part 1: Creating the Development Environment](#chapter2part1)
-    - [Chapter 2 - Part 2: Init Apache Airflow with Docker](#chapter2part2)
-3. [Chapter 3: Data Pipeline with Airflow](#chapter3)
-    - [Chapter 3 - Part 1: The Project](#chapter3part1)
+1. [Chapter 1: Introduction to Apache Airflow](#chapter1)
+  - [Chapter 1 - Part 1: What is Apache Airflow and why use it?](#chapter1part1)
+    - [Chapter 1 - Part 1.1: What is Apache Airflow?](#chapter1part1.1)
+    - [Chapter 1 - Part 1.2: Why Use Apache Airflow?](#chapter1part1.2)
+    - [Chapter 1 - Part 1.3: Real-World Applications](#chapter1part1.3)
+  - [Chapter 1 - Part 2: Understanding DAGs, Tasks, and Operators](#chapter1part2)
+    - [Chapter 1 - Part 2.1: Directed Acyclic Graphs (DAGs)](#chapter1part2.1)
+    - [Chapter 1 - Part 2.2: Tasks](#chapter1part2.2)
+    - [Chapter 1 - Part 2.3: Operators](#chapter1part2.3)
+    - [Chapter 1 - Part 2.4: Real-World Application](#chapter1part2.4)
+  - [Chapter 1 - Part 3: Airflow Architecture: Scheduler, Webserver, and Metadata Database](#chapter1part3)
+    - [Chapter 1 - Part 3.1: Core Components of Airflow](#chapter1part3.1)
+    - [Chapter 1 - Part 3.2: Interaction Between Components](#chapter1part3.2)
+    - [Chapter 1 - Part 3.3: Executors](#chapter1part3.3)
+  - [Chapter 1 - Part 4: Setting up a Local Airflow Environment (using Docker)](#chapter1part4)
+    - [Chapter 1 - Part 4.1: Understanding Docker for Airflow](#chapter1part4.1)
+    - [Chapter 1 - Part 4.2: Prerequisites](#chapter1part4.2)
+    - [Chapter 1 - Part 4.3: Setting Up Airflow with Docker Compose](#chapter1part4.3)
+    - [Chapter 1 - Part 4.4: Customizing Your Airflow Environment](#chapter1part4.4)
+    - [Chapter 1 - Part 4.5: Troubleshooting Common Issues](#chapter1part4.5)
+  - [Chapter 1 - Part 5: Introduction to the Airflow UI](#chapter1part5)
+    - [Chapter 1 - Part 5.1: Accessing the Airflow UI](#chapter1part5.1)
+    - [Chapter 1 - Part 5.2: Key Components of the Airflow UI](#chapter1part5.2)
+    - [Chapter 1 - Part 5.3: Using the Airflow UI for Monitoring and Troubleshooting](#chapter1part5.3)
+    - [Chapter 1 - Part 5.4: Practice Activities](#chapter1part5.4)
+  
+## <a name="chapter1"></a>Chapter 1: Introduction to Apache Airflow
 
-## <a name="chapter1"></a>Chapter 1: Introduction to Airflow
+#### <a name="chapter1part1"></a>Chapter 1 - Part 1: What is Apache Airflow and why use it?
 
-#### <a name="chapter1part1"></a>Chapter 1 - Part 1: What is Apache Airflow
+#### <a name="chapter1part1.1"></a>Chapter 1 - Part 1.1: What is Apache Airflow?
 
-Airflow is an open source platform to programmatically author, schedule, and monitor workflows.
+#### <a name="chapter1part1.2"></a>Chapter 1 - Part 1.2: Why Use Apache Airflow?
 
-Airflow is a tool that helps you create, organize, and keep track of your data tasks automatically
+#### <a name="chapter1part1.3"></a>Chapter 1 - Part 1.3: Real-World Applications
 
- It was initially developed by Airbnb in 2014 to manage complex workflows and data pipelines. Since then, it has become one of the most popular tools for orchestrating workflows, particularly in data engineering and machine learning.
+#### <a name="chapter1part2"></a>Chapter 1 - Part 2: Understanding DAGs, Tasks, and Operators
 
-Airflow provides a flexible and scalable way to define and automate workflows, making it easy to manage tasks, track progress, and handle dependencies between various stages of a workflow. It is designed to scale horizontally, making it ideal for large-scale data engineering projects or any environment where automation and reliability are crucial.
+#### <a name="chapter1part2.1"></a>Chapter 1 - Part 2.1: Directed Acyclic Graphs (DAGs)
 
-**Key Features of Apache Airflow**
+**DAG (Directed Acyclic Grapsh)**
 
-- **Workflow as Code**: Airflow allows you to define workflows using standard Python code. This approach offers flexibility, as you can use Python’s programming features (functions, loops, conditionals, etc.) to create dynamic and reusable workflows.
+- The Dag means directed acyclic graph, and a Dag is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies.
+- It helps you to define the structure of your entire workflow, showing which tasks needs to happen before others.
+- A Dag in airflow lists all the tasks to complete your data workflow in the right sequence.
 
-- **DAG (Directed Acyclic Graph) Structure**: Workflows in Airflow are represented as DAGs. A DAG is a collection of tasks with dependencies between them, where each task represents a unit of work (e.g., running a script, querying a database, or sending a notification). The acyclic nature ensures that tasks do not create circular dependencies.
+<br>
 
-- **Scheduling**: Airflow has a powerful scheduler that triggers workflows based on time intervals or external events. You can schedule workflows to run daily, hourly, or at any custom interval, ensuring that data pipelines are always up-to-date.
+<div align="center"><img src="img/dagexample-w527-h344.png" width=527 height=344><br><sub>Example of a DAG - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
-- **Task Dependencies and Management**: Airflow allows you to define complex dependencies between tasks, ensuring that they are executed in the right order. You can also set up retries, define timeouts, and handle task failures gracefully.
+<br>
 
-- **UI for Monitoring**: Airflow comes with an intuitive web-based user interface where you can monitor, trigger, and debug workflows. The UI provides a visual representation of DAGs, showing task status, logs, and execution times, making it easy to manage and troubleshoot workflows.
+You have four tasks T1, T2, T3, and T4. T4 depends on T1, T2, and T3.
+So you have those directed dependencies, and you know that in order to execute T4, because, T1, T2 and T3 need to run first.
 
-- **Extensibility with Operators**: Airflow provides a wide variety of built-in operators to interact with different services (e.g., AWS S3, Google Cloud, databases, and more). You can also create custom operators to extend its functionality or to handle specific tasks.
+**You don't have any cycle in your graph in your Dag**
 
-- **Scalability**: Airflow is built to scale. It supports parallelism and distributed task execution, allowing you to scale out your workflows across multiple worker nodes. This makes Airflow suitable for environments ranging from small-scale to enterprise-level data pipelines.
+<br>
 
-**Common Use Cases for Airflow**
+<div align="center"><img src="img/notdagexample-w527-h459.png" width=527 height=459><br><sub>Example of NOT a DAG - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
-- **ETL Pipelines (Extract, Transform, Load)**: Airflow is frequently used to orchestrate data pipelines that extract data from various sources, transform it, and load it into target systems like data warehouses.
+<br>
 
-- **Data Engineering and Analytics**: Teams use Airflow to automate data processing workflows, such as running scheduled queries on databases or orchestrating machine learning model training pipelines.
+Because you have a loop. You can see that T4 depends on t1, t2, t3, but T1 also depends on T4. So you have a loop like an infinite loop. And this is not an acyclic graph.
 
-- **Data Integration**: Airflow can manage workflows that integrate data from multiple APIs, databases, and cloud storage services, allowing organizations to build robust data ecosystems.
+**Operator**
 
-- **Machine Learning Pipelines**: Airflow can be used to automate and orchestrate complex machine learning workflows, from data preprocessing to model training and evaluation.
-
-#### <a name="chapter1part2"></a>Chapter 1 - Part 2: Benefits of Airflow
-
-**Dynamic**
-
-- Airflow can adapt and change based on what is happening.
-  - Python Based: You can write your workflows in Python, since Python is more easy to use
-  - Dynamic tasks: Generate tasks based on dynamic inputs.
-  - Dynamic workflows: Generate workflows based on static inputs.
-  - Branching: Execute a different set of tasks based on a condition or result
+- An operator defines a single, ideally idempotent task in your Dag (Idempotent means that you can run this task, this operator as many times as you want for the same input.)
+- Operators allow you to break down your workflow into discrete, manageable pieces of work.
+- Airflow has thousands of operators.
+  - The PythonOperator to execute a Python script or function.
+  - The BashOperator to execute a bash script, or command
+  - The SQLExecuteQueryOperator to execute a SQL query to a database
+  - The FileSensor to wait for a file
  
-**Scalability**
+**Task/Task Instance**
 
-- Airflow is built to scale.
-- It supports parallelism and distributed task execution, allowing you to scale out your workflows across multiple worker nodes.
-- This makes Airflow suitable for environments ranging from small-scale to enterprise-level data pipelines.
+- A task is a specific instance of an operator. When an operator is assigned to a Dag, it becomes a task.
+- Tasks are the actual units of work that get executed when your Dag runs.
 
-**Fully Functional User Interface**
+**Workflow**
 
-- Airflow has a visual dashboard where you can see and control your tasks and workflows
-  - can monitor and troubleshoot your workflows.
-  - can highlight relationships between workflows and tasks.
-  - identify bottlenecks with performance metrics
-  - manage users and roles of your airflow instance
+- A workflow is the entire process defined by your Dag, including all tasks and their dependencies.
+- It represents your entire data pipeline showing how all the pieces fit together to achieve your goal
+
+<br>
+
+<div align="center"><img src="img/workflow-w812-h762.png" width=812 height=762><br><sub>Example of a Workflow - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+When the BashOperator runs, for example, in 1 of janary of 2024, it becomes a Task Instance (TI)
+
+**Tasks vs. operators**
+
+Operators provide the implementation of a piece of work. Airflow has a class called BaseOperator and many subclasses inheriting from the BaseOperator, such as PythonOperator, EmailOperator, and OracleOperator. Tasks in Airflow manage the execution of an operator;
+they can be thought of as a small wrapper or manager around an operator that ensures the operator executes correctly. The user can focus on the work to be done by using operators, while Airflow ensures correct execution of the work via tasks.
+
+- Operators define what a task does, while tasks are the actual instances of these actions that get executed within a DAG.
+- Operators are reusable templates, whereas tasks are tied to a specific workflow and its execution.
+
+- **Operator**: PythonOperator defines the action of running a Python function.
+- **Task**: When you assign the PythonOperator to a DAG, it becomes a task, like process_data_task, and represents the specific step of running that Python function in the workflow.
+
+Scheduling and executing pipelines
+
+#### <a name="chapter1part2.2"></a>Chapter 1 - Part 2.2: Tasks
+
+#### <a name="chapter1part2.3"></a>Chapter 1 - Part 2.3: Operators
+
+#### <a name="chapter1part2.4"></a>Chapter 1 - Part 2.4: Real-World Application
+
+#### <a name="chapter1part3"></a>Chapter 1 - Part 3: Airflow Architecture: Scheduler, Webserver, and Metadata Database
+
+Airflow can run in both single-node and multi-node setups, with each setup having distinct architectural differences. Here's a breakdown of each architecture:
+
+**Single-Node Airflow Architecture**
+
+- In a single-node setup, all Airflow components (Webserver, Scheduler, Metadata Database, and Worker) run on a single machine.
+- This is typically used for small-scale deployments, testing, or development environments.
+- Core Components:
+  - Webserver:
+    - The web-based user interface (UI) where you can monitor DAGs, view logs, and manage tasks.
+    - In a single-node setup, it runs on the same machine as the other components.
+  - Scheduler:
+    - Responsible for scheduling DAG runs and ensuring tasks are executed based on their defined schedule intervals.
+    - In a single-node architecture, the scheduler runs on the same machine as the webserver and workers.
+  - Metadata Database:
+    - Stores metadata about DAGs, tasks, and their execution history. Airflow uses databases like MySQL or PostgreSQL.
+    - The metadata database is hosted locally on the same machine in this setup.
+  - Worker:
+    - Executes the actual tasks of the DAG. The tasks are processed in parallel using the machine's available resources.
+    - In a single-node setup, there is only one worker, which runs on the same machine as all other components.
+
+- Positve:
+  - Simpler to manage: All components are on one machine, making it easier to deploy, set up, and troubleshoot.
+  - Good for development: Perfect for development or small-scale workflows, where scaling or distributed execution isn’t required.
+- Limitations:
+  - Limited scalability: A single machine can only handle so many tasks simultaneously due to hardware constraints.
+  - Single point of failure: If the machine goes down, all Airflow services stop.
  
-**Extensibility**
+**Multi-Node Airflow Architecture**
 
-- Add a new features or connect airflow to other tools easily.
-  - Many providers: package with functions to interact with the tool or service, such as AWS, snowflake and so on
-  - Customizablw user interface
-  - Possibility to custom existing functions
+- In a multi-node setup, Airflow components are distributed across different machines. This allows Airflow to handle larger workloads by running multiple workers across multiple machines.
+- This is typically used in production environments where high availability, fault tolerance, and scalability are critical.
+- Core Components:
+  - Webserver (Single Instance):
+    - The user interface remains centralized and usually runs on a dedicated machine, allowing users to monitor workflows.
+    - The Webserver is stateless, so it can run independently without being involved in task execution.
+  - Scheduler (Single Instance or Highly Available Mode):
+    - The Scheduler is responsible for queuing tasks. In a multi-node setup, it runs separately from workers.
+    - In larger setups, you might also set up a highly available mode with multiple schedulers running in active/passive mode to prevent any single point of failure.
+  - Metadata Database (Single Instance):
+    - The centralized database that tracks the state of the tasks and DAGs.
+    - This is usually hosted on a dedicated machine and can be scaled separately using database replication techniques.
+  - Worker (Multiple Instances):
+    - Workers are distributed across different machines (nodes), allowing them to execute tasks in parallel, thereby increasing the processing capacity.
+    - Workers pull tasks from the task queue and execute them. This multi-node worker setup allows you to scale the number of workers based on the workload.
+    - You can use distributed systems like Celery or Kubernetes to manage these workers.
+  - Message Broker (e.g., RabbitMQ, Redis):
+    - In a multi-node setup, tasks are queued in a message broker (like RabbitMQ or Redis) to distribute the load among the workers.
+    - The message broker ensures communication between the Scheduler and the distributed Workers.
 
-#### <a name="chapter1part3"></a>Chapter 1 - Part 3: Core Components of Airflow
+- Positive:
+  - Scalability: You can add more worker nodes to handle an increasing workload without overwhelming a single machine.
+  - Fault Tolerance: If one worker node fails, other worker nodes can continue processing tasks, increasing system reliability.
+  - Performance: By distributing tasks across multiple machines, you can process workflows faster, improving throughput.
+- Limitations:
+  - Complexity: Multi-node setups require more configuration and maintenance. Setting up and monitoring multiple nodes and components adds overhead.
+  - Resource Intensive: You’ll need to allocate more resources (multiple machines or cloud instances) to manage the infrastructure.
+ 
+  **Use Case Scenarios**
+
+- Single-node: Suitable for small development environments where workflows and tasks are minimal and don't require much scalability.
+- Multi-node: Ideal for production environments with large-scale data pipelines, high availability needs, and distributed task execution requirements.
+
+#### <a name="chapter1part3.1"></a>Chapter 1 - Part 3.1: Core Components of Airflow
 
 **The Web Server**
 
@@ -159,8 +252,6 @@ Airflow provides a flexible and scalable way to define and automate workflows, m
   - Example:
     - A worker processes a task that involves downloading a file from an external API and saving it to a local directory. Once the worker completes the task, it reports success, and the scheduler can trigger the next dependent task.
    
-#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Scheduling and executing pipelines
-
 **Defining pipelines flexibly in (Python) code**
 
 In Airflow, you define your DAGs using Python code in DAG files, which are essentially Python scripts that describe the structure of the corresponding DAG. As such, each DAG file typically describes the set of tasks for a given DAG and the dependencies between the tasks, which are then parsed by Airflow to identify the DAG structure. Other than this, DAG files typically contain some additional metadata about the DAG telling Airflow how and when it should be executed, and so on. We’ll dive into this scheduling more in the next section.
@@ -187,138 +278,474 @@ At a high level, the scheduler runs through the following steps
 <div align="center"><img src="img/airflowoverviewprocess-w1121-h657.png" width=1121 height=657><br><sub>Airflow overview Process - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
 
 <br>
+
+#### <a name="chapter1part3.2"></a>Chapter 1 - Part 3.2: Interaction Between Components
+
+#### <a name="chapter1part3.3"></a>Chapter 1 - Part 3.3: Executors
+
+#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Setting up a Local Airflow Environment (using Docker)
+
+Setting up a local Airflow environment is crucial for learning, experimenting, and developing DAGs without affecting production systems. Docker provides an isolated and reproducible environment, ensuring consistency across different machines. This lesson will guide you through setting up Airflow using Docker, covering the necessary steps and configurations to get you started. By the end of this lesson, you'll have a fully functional Airflow instance running locally, ready for you to build and test your workflows.
+
+#### <a name="chapter1part4.1"></a>Chapter 1 - Part 4.1: Understanding Docker for Airflow
+
+Docker is a platform that uses containerization to package an application and all its dependencies together into a standardized unit for software development. An Airflow Docker setup encapsulates the Airflow scheduler, web server, worker processes, and metadata database within containers. This approach offers several advantages:
+
+- **Isolation**: Each Airflow component runs in its own container, preventing conflicts with other software on your system.
+- **Reproducibility**: The Docker image ensures that the Airflow environment is consistent across different machines, regardless of the underlying operating system.
+- **Simplified Setup**: Docker streamlines the installation process, eliminating the need to manually install and configure Airflow's dependencies.
+- **Scalability**: Docker Compose allows you to easily scale individual Airflow components as needed.
+
+**Docker Concepts: Images and Containers**
+
+It's important to understand the distinction between Docker images and containers:
+
+- **Docker Image**: A read-only template that contains instructions for creating a container. Think of it as a blueprint for your Airflow environment.
+- **Docker Container**: A runnable instance of an image. It's the actual running Airflow environment.
+
+**Why Docker Compose?**
+
+Docker Compose is a tool for defining and running multi-container Docker applications. In the context of Airflow, Docker Compose simplifies the process of managing the various Airflow components (scheduler, webserver, database) as a single unit. It uses a YAML file (docker-compose.yaml) to define the services, networks, and volumes required for the application.
+
+#### <a name="chapter1part4.2"></a>Chapter 1 - Part 4.2: Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Docker**: Docker is the core technology for containerization. You can download and install Docker Desktop from the official Docker website: https://www.docker.com/products/docker-desktop/
+- **Docker Compose**: Docker Compose is used to define and manage multi-container applications. Docker Compose is included with Docker Desktop. Verify the installation by running docker-compose --version in your terminal.
+
+#### <a name="chapter1part4.3"></a>Chapter 1 - Part 4.3: Setting Up Airflow with Docker Compose
+
+The most common and recommended way to set up Airflow locally is by using the official Airflow Docker image and Docker Compose.
+
+**Creating the docker-compose.yaml File**
+
+Create a new directory for your Airflow project and create a docker-compose.yaml file within it. This file will define the services needed for Airflow.
+
+```yaml
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+# Basic Airflow cluster configuration for CeleryExecutor with Redis and PostgreSQL.
+#
+# WARNING: This configuration is for local development. Do not use it in a production deployment.
+#
+# This configuration supports basic configuration using environment variables or an .env file
+# The following variables are supported:
+#
+# AIRFLOW_IMAGE_NAME           - Docker image name used to run Airflow.
+#                                Default: apache/airflow:2.5.1
+# AIRFLOW_UID                  - User ID in Airflow containers
+#                                Default: 50000
+# AIRFLOW_PROJ_DIR             - Base path to which all the files will be volumed.
+#                                Default: .
+# Those configurations are useful mostly in case of standalone testing/running Airflow in test/try-out mode
+#
+# _AIRFLOW_WWW_USER_USERNAME   - Username for the administrator account (if requested).
+#                                Default: airflow
+# _AIRFLOW_WWW_USER_PASSWORD   - Password for the administrator account (if requested).
+#                                Default: airflow
+# _PIP_ADDITIONAL_REQUIREMENTS - Additional PIP requirements to add when starting all containers.
+#                                Default: ''
+#
+# Feel free to modify this file to suit your needs.
+---
+version: '3'
+x-airflow-common:
+  &airflow-common
+  # In order to add custom dependencies or upgrade provider packages you can use your extended image.
+  # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
+  # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.5.1}
+  # build: .
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    # For backward compatibility, with Airflow <2.3
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+  volumes:
+    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    &airflow-common-depends-on
+    redis:
+      condition: service_healthy
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+    restart: always
+
+  redis:
+    image: redis:latest
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: webserver
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-worker:
+    <<: *airflow-common
+    command: celery worker
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    environment:
+      <<: *airflow-common-env
+      # Required to handle warm shutdown of the celery workers properly
+      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+      DUMB_INIT_SETSID: "0"
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-triggerer:
+    <<: *airflow-common
+    command: triggerer
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    # yamllint disable rule:line-length
+    command:
+      - -c
+      - |
+        function ver() {
+          printf "%04d%04d%04d%04d" $${1//./ }
+        }
+        airflow_version=$$(AIRFLOW__LOGGING__LOGGING_LEVEL=INFO && gosu airflow airflow version)
+        airflow_version_comparable=$$(ver $${airflow_version})
+        min_airflow_version=2.2.0
+        min_airflow_version_comparable=$$(ver $${min_airflow_version})
+        if (( airflow_version_comparable < min_airflow_version_comparable )); then
+          echo
+          echo -e "\033[1;31mERROR!!!: Too old Airflow version $${airflow_version}!\e[0m"
+          echo "The minimum Airflow version supported: $${min_airflow_version}. Only use this or higher!"
+          echo
+          exit 1
+        fi
+        if [[ -z "${AIRFLOW_UID}" ]]; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: AIRFLOW_UID not set!\e[0m"
+          echo "If you are on Linux, you SHOULD follow the instructions below to set "
+          echo "AIRFLOW_UID environment variable, otherwise files will be owned by root."
+          echo "For other operating systems you can get rid of the warning with manually created .env file:"
+          echo "    See: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#setting-the-right-airflow-user"
+          echo
+        fi
+        one_meg=1048576
+        mem_available=$$(($$(getconf _PHYS_PAGES) * $$(getconf PAGE_SIZE) / one_meg))
+        cpus_available=$$(grep -cE 'cpu[0-9]+' /proc/stat)
+        disk_available=$$(df / | tail -1 | awk '{print $$4}')
+        warning_resources="false"
+        if (( mem_available < 4000 )) ; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough memory available for Docker.\e[0m"
+          echo "At least 4GB of memory required. You have $$(numfmt --to iec $$((mem_available * one_meg)))"
+          echo
+          warning_resources="true"
+        fi
+        if (( cpus_available < 2 )); then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough CPUS available for Docker.\e[0m"
+          echo "At least 2 CPUs recommended. You have $${cpus_available}"
+          echo
+          warning_resources="true"
+        fi
+        if (( disk_available < one_meg * 10 )); then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough Disk space available for Docker.\e[0m"
+          echo "At least 10 GBs recommended. You have $$(numfmt --to iec $$((disk_available * 1024 )))"
+          echo
+          warning_resources="true"
+        fi
+        if [[ $${warning_resources} == "true" ]]; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: You have not enough resources to run Airflow (see above)!\e[0m"
+          echo "Please follow the instructions to increase amount of resources available:"
+          echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
+          echo
+        fi
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow version
+    # yamllint enable rule:line-length
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: ''
+    user: "0:0"
+    volumes:
+      - ${AIRFLOW_PROJ_DIR:-.}:/sources
+
+  airflow-cli:
+    <<: *airflow-common
+    profiles:
+      - debug
+    environment:
+      <<: *airflow-common-env
+      CONNECTION_CHECK_MAX_COUNT: "0"
+    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+    command:
+      - bash
+      - -c
+      - airflow
+
+  # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
+  # or by explicitly targeted on the command line e.g. docker-compose up flower.
+  # See: https://docs.docker.com/compose/profiles/
+  flower:
+    <<: *airflow-common
+    command: celery flower
+    profiles:
+      - flower
+    ports:
+      - 5555:5555
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-db-volume:
+```
+
+**Explanation of the docker-compose.yaml File**
+
+- ```x-airflow-common```: Defines common configurations for Airflow services, such as the image, environment variables, volumes, and user ID.
+- ```postgres```: This service runs a PostgreSQL database, which Airflow uses to store metadata about DAGs, tasks, and runs.
+- ```redis```: This service runs a Redis server, which is used as the Celery broker.
+- ```airflow-webserver```: This service runs the Airflow web server, which provides a user interface for managing and monitoring DAGs.
+- ```airflow-scheduler```: This service runs the Airflow scheduler, which is responsible for scheduling and executing DAGs.
+- ```airflow-worker```: This service runs the Airflow worker, which executes the tasks defined in the DAGs.
+- ```airflow-triggerer```: The airflow-triggerer is a crucial component for running asynchronous operators in Airflow.
+- ```airflow-init```: This service runs a script to initialize the Airflow database, create a user, and ensure proper file permissions.
+- Volumes: The volumes section maps the dags, logs, and plugins directories on your host machine to the corresponding directories in the containers.
+- Environment Variables: Environment variables such as AIRFLOW__CORE__EXECUTOR and AIRFLOW__DATABASE__SQL_ALCHEMY_CONN configure Airflow's behavior.
+
+**Step-by-Step Guide**
+
+- **Create a Directory**: Create a new directory for your Airflow project.
+
+```
+mkdir airflow-docker-setup
+cd airflow-docker-setup
+```
+
+- **Save the Docker Compose File**: Save the provided docker-compose.yaml file into this directory.
+
+- **Create .env File (Optional)**: You can create a .env file to override the default environment variables. This is useful for setting your own passwords, user IDs, or Airflow image version.
+
+Here’s an example .env file:
+
+```
+AIRFLOW_UID=50000
+_AIRFLOW_WWW_USER_USERNAME=admin
+_AIRFLOW_WWW_USER_PASSWORD=admin
+```
+
+- **Directory Structure**: Create dags, logs, and plugins folders.
+
+```
+mkdir -p dags logs plugins
+```
+
+These directories are mounted as volumes in the Docker Compose file, allowing you to add DAGs, check logs, and add plugins easily.
+
+- **Run Docker Compose**: Start the Airflow environment using Docker Compose.
+
+```
+docker-compose up -d
+```
+
+This command will download the necessary images and start the containers in detached mode.
+
+- **Check the Status**: Verify that all containers are running correctly.
+
+```
+docker-compose ps
+```
+
+You should see all services (postgres, redis, airflow-webserver, airflow-scheduler, airflow-worker, airflow-triggerer) listed as running.
+
+- **Access Airflow UI**: Open your web browser and go to http://localhost:8080. Log in with the username and password specified in your .env file or the default (airflow:airflow).
+
+- **Stopping the Environment**: When you're done, you can stop the environment by running:
+
+```
+docker-compose down
+```
+
+To remove the volumes as well (if you want to reset the environment completely):
+
+```
+docker-compose down -v
+```
+
+#### <a name="chapter1part4.4"></a>Chapter 1 - Part 4.4: Customizing Your Airflow Environment
+
+The docker-compose.yaml file provides a basic Airflow setup. You can customize it to suit your specific needs.
+
+**Mounting DAGs**
+
+The docker-compose.yaml file mounts the ./dags directory on your host machine to the /opt/airflow/dags directory in the container. This allows you to add DAGs to your Airflow environment by simply placing them in the ./dags directory.
+
+Create a dags directory in your project directory. Any .py files placed in this directory will be recognized as DAGs by Airflow.
+
+**Adding Plugins**
+
+Similarly, the docker-compose.yaml file mounts the ./plugins directory on your host machine to the /opt/airflow/plugins directory in the container. This allows you to add custom operators, hooks, and sensors to your Airflow environment by placing them in the ./plugins directory.
+
+Create a plugins directory in your project directory. Place your plugin files in this directory.
+
+**Configuring Environment Variables**
+
+You can configure Airflow by setting environment variables in the docker-compose.yaml file. The environment section of each service allows you to specify environment variables that will be available to the container.
+
+For example, you can set the AIRFLOW__CORE__EXECUTOR environment variable to LocalExecutor to use the LocalExecutor instead of the CeleryExecutor. However, for a production-like setup, CeleryExecutor is recommended.
+
+**Using a Different Database**
+
+While the docker-compose.yaml file uses PostgreSQL as the metadata database, you can also use other databases, such as MySQL or SQLite. To use a different database, you need to:
+
+- Change the database image in the docker-compose.yaml file.
+- Update the AIRFLOW__CORE__SQL_ALCHEMY_CONN environment variable to point to the new database.
+- Ensure that the necessary database drivers are installed in the Airflow container.
+
+Using SQLite is generally not recommended for production environments due to its limitations in terms of concurrency and scalability.
+
+#### <a name="chapter1part4.5"></a>Chapter 1 - Part 4.5: Troubleshooting Common Issues
+
+- **Airflow UI not accessible**: Ensure that the Docker containers are running and that the ports are correctly mapped in the docker-compose.yaml file. Check the logs of the airflow-webserver container for any errors.
+
+- **DAGs not showing up**: Ensure that the DAG files are placed in the ./dags directory and that the directory is correctly mounted in the docker-compose.yaml file. Check the logs of the airflow-scheduler container for any errors.
+
+- **Database connection errors**: Ensure that the PostgreSQL database is running and that the AIRFLOW__CORE__SQL_ALCHEMY_CONN environment variable is correctly configured. Check the logs of the Airflow containers for any database connection errors.
+
+- **Permission issues**: Ensure that the user running the Docker containers has the necessary permissions to access the mounted directories.
+
+#### <a name="chapter1part5"></a>Chapter 1 - Part 5: Introduction to the Airflow UI
+
+#### <a name="chapter1part5.1"></a>Chapter 1 - Part 5.1: Accessing the Airflow UI
+
+#### <a name="chapter1part5.2"></a>Chapter 1 - Part 5.2: Key Components of the Airflow UI
+
+#### <a name="chapter1part5.3"></a>Chapter 1 - Part 5.3: Using the Airflow UI for Monitoring and Troubleshooting
+
+#### <a name="chapter1part5.4"></a>Chapter 1 - Part 5.4: Practice Activities
+
+
+
+#### <a name="chapter1part3"></a>Chapter 1 - Part 3: Core Components of Airflow
+
+
+   
+#### <a name="chapter1part4"></a>Chapter 1 - Part 4: Scheduling and executing pipelines
+
+
    
 #### <a name="chapter1part5"></a>Chapter 1 - Part 5: Core Concepts of Airflow
 
-**DAG (Directed Acyclic Grapsh)**
 
-- The Dag means directed acyclic graph, and a Dag is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies.
-- It helps you to define the structure of your entire workflow, showing which tasks needs to happen before others.
-- A Dag in airflow lists all the tasks to complete your data workflow in the right sequence.
-
-<br>
-
-<div align="center"><img src="img/dagexample-w527-h344.png" width=527 height=344><br><sub>Example of a DAG - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
-
-<br>
-
-You have four tasks T1, T2, T3, and T4. T4 depends on T1, T2, and T3.
-So you have those directed dependencies, and you know that in order to execute T4, because, T1, T2 and T3 need to run first.
-
-**You don't have any cycle in your graph in your Dag**
-
-<br>
-
-<div align="center"><img src="img/notdagexample-w527-h459.png" width=527 height=459><br><sub>Example of NOT a DAG - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
-
-<br>
-
-Because you have a loop. You can see that T4 depends on t1, t2, t3, but T1 also depends on T4. So you have a loop like an infinite loop. And this is not an acyclic graph.
-
-**Operator**
-
-- An operator defines a single, ideally idempotent task in your Dag (Idempotent means that you can run this task, this operator as many times as you want for the same input.)
-- Operators allow you to break down your workflow into discrete, manageable pieces of work.
-- Airflow has thousands of operators.
-  - The PythonOperator to execute a Python script or function.
-  - The BashOperator to execute a bash script, or command
-  - The SQLExecuteQueryOperator to execute a SQL query to a database
-  - The FileSensor to wait for a file
- 
-**Task/Task Instance**
-
-- A task is a specific instance of an operator. When an operator is assigned to a Dag, it becomes a task.
-- Tasks are the actual units of work that get executed when your Dag runs.
-
-**Workflow**
-
-- A workflow is the entire process defined by your Dag, including all tasks and their dependencies.
-- It represents your entire data pipeline showing how all the pieces fit together to achieve your goal
-
-<br>
-
-<div align="center"><img src="img/workflow-w812-h762.png" width=812 height=762><br><sub>Example of a Workflow - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
-
-<br>
-
-When the BashOperator runs, for example, in 1 of janary of 2024, it becomes a Task Instance (TI)
-
-**Tasks vs. operators**
-
-Operators provide the implementation of a piece of work. Airflow has a class called BaseOperator and many subclasses inheriting from the BaseOperator, such as PythonOperator, EmailOperator, and OracleOperator. Tasks in Airflow manage the execution of an operator;
-they can be thought of as a small wrapper or manager around an operator that ensures the operator executes correctly. The user can focus on the work to be done by using operators, while Airflow ensures correct execution of the work via tasks.
-
-- Operators define what a task does, while tasks are the actual instances of these actions that get executed within a DAG.
-- Operators are reusable templates, whereas tasks are tied to a specific workflow and its execution.
-
-- **Operator**: PythonOperator defines the action of running a Python function.
-- **Task**: When you assign the PythonOperator to a DAG, it becomes a task, like process_data_task, and represents the specific step of running that Python function in the workflow.
-
-Scheduling and executing pipelines
 
 #### <a name="chapter1part6"></a>Chapter 1 - Part 6: The Different Architectures
 
-Airflow can run in both single-node and multi-node setups, with each setup having distinct architectural differences. Here's a breakdown of each architecture:
 
-**Single-Node Airflow Architecture**
-
-- In a single-node setup, all Airflow components (Webserver, Scheduler, Metadata Database, and Worker) run on a single machine.
-- This is typically used for small-scale deployments, testing, or development environments.
-- Core Components:
-  - Webserver:
-    - The web-based user interface (UI) where you can monitor DAGs, view logs, and manage tasks.
-    - In a single-node setup, it runs on the same machine as the other components.
-  - Scheduler:
-    - Responsible for scheduling DAG runs and ensuring tasks are executed based on their defined schedule intervals.
-    - In a single-node architecture, the scheduler runs on the same machine as the webserver and workers.
-  - Metadata Database:
-    - Stores metadata about DAGs, tasks, and their execution history. Airflow uses databases like MySQL or PostgreSQL.
-    - The metadata database is hosted locally on the same machine in this setup.
-  - Worker:
-    - Executes the actual tasks of the DAG. The tasks are processed in parallel using the machine's available resources.
-    - In a single-node setup, there is only one worker, which runs on the same machine as all other components.
-
-- Positve:
-  - Simpler to manage: All components are on one machine, making it easier to deploy, set up, and troubleshoot.
-  - Good for development: Perfect for development or small-scale workflows, where scaling or distributed execution isn’t required.
-- Limitations:
-  - Limited scalability: A single machine can only handle so many tasks simultaneously due to hardware constraints.
-  - Single point of failure: If the machine goes down, all Airflow services stop.
- 
-**Multi-Node Airflow Architecture**
-
-- In a multi-node setup, Airflow components are distributed across different machines. This allows Airflow to handle larger workloads by running multiple workers across multiple machines.
-- This is typically used in production environments where high availability, fault tolerance, and scalability are critical.
-- Core Components:
-  - Webserver (Single Instance):
-    - The user interface remains centralized and usually runs on a dedicated machine, allowing users to monitor workflows.
-    - The Webserver is stateless, so it can run independently without being involved in task execution.
-  - Scheduler (Single Instance or Highly Available Mode):
-    - The Scheduler is responsible for queuing tasks. In a multi-node setup, it runs separately from workers.
-    - In larger setups, you might also set up a highly available mode with multiple schedulers running in active/passive mode to prevent any single point of failure.
-  - Metadata Database (Single Instance):
-    - The centralized database that tracks the state of the tasks and DAGs.
-    - This is usually hosted on a dedicated machine and can be scaled separately using database replication techniques.
-  - Worker (Multiple Instances):
-    - Workers are distributed across different machines (nodes), allowing them to execute tasks in parallel, thereby increasing the processing capacity.
-    - Workers pull tasks from the task queue and execute them. This multi-node worker setup allows you to scale the number of workers based on the workload.
-    - You can use distributed systems like Celery or Kubernetes to manage these workers.
-  - Message Broker (e.g., RabbitMQ, Redis):
-    - In a multi-node setup, tasks are queued in a message broker (like RabbitMQ or Redis) to distribute the load among the workers.
-    - The message broker ensures communication between the Scheduler and the distributed Workers.
-
-- Positive:
-  - Scalability: You can add more worker nodes to handle an increasing workload without overwhelming a single machine.
-  - Fault Tolerance: If one worker node fails, other worker nodes can continue processing tasks, increasing system reliability.
-  - Performance: By distributing tasks across multiple machines, you can process workflows faster, improving throughput.
-- Limitations:
-  - Complexity: Multi-node setups require more configuration and maintenance. Setting up and monitoring multiple nodes and components adds overhead.
-  - Resource Intensive: You’ll need to allocate more resources (multiple machines or cloud instances) to manage the infrastructure.
- 
-  **Use Case Scenarios**
-
-- Single-node: Suitable for small development environments where workflows and tasks are minimal and don't require much scalability.
-- Multi-node: Ideal for production environments with large-scale data pipelines, high availability needs, and distributed task execution requirements.
 
 #### <a name="chapter1part7"></a>Chapter 1 - Part 7: Reasons not to choose Airflow
 
