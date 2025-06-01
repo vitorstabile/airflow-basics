@@ -16,6 +16,7 @@
       - [Chapter 1 - Part 3.1: Core Components of Airflow](#chapter1part3.1)
       - [Chapter 1 - Part 3.2: Interaction Between Components](#chapter1part3.2)
       - [Chapter 1 - Part 3.3: Executors](#chapter1part3.3)
+      - [Chapter 1 - Part 3.4: Architectures in Airflow](#chapter1part3.4)
     - [Chapter 1 - Part 4: Setting up a Local Airflow Environment (using Docker)](#chapter1part4)
       - [Chapter 1 - Part 4.1: Understanding Docker for Airflow](#chapter1part4.1)
       - [Chapter 1 - Part 4.2: Prerequisites](#chapter1part4.2)
@@ -392,69 +393,11 @@ When the BashOperator runs, for example, in 1 of janary of 2024, it becomes a Ta
 
 #### <a name="chapter1part3"></a>Chapter 1 - Part 3: Airflow Architecture: Scheduler, Webserver, and Metadata Database
 
-Airflow can run in both single-node and multi-node setups, with each setup having distinct architectural differences. Here's a breakdown of each architecture:
-
-**Single-Node Airflow Architecture**
-
-- In a single-node setup, all Airflow components (Webserver, Scheduler, Metadata Database, and Worker) run on a single machine.
-- This is typically used for small-scale deployments, testing, or development environments.
-- Core Components:
-  - Webserver:
-    - The web-based user interface (UI) where you can monitor DAGs, view logs, and manage tasks.
-    - In a single-node setup, it runs on the same machine as the other components.
-  - Scheduler:
-    - Responsible for scheduling DAG runs and ensuring tasks are executed based on their defined schedule intervals.
-    - In a single-node architecture, the scheduler runs on the same machine as the webserver and workers.
-  - Metadata Database:
-    - Stores metadata about DAGs, tasks, and their execution history. Airflow uses databases like MySQL or PostgreSQL.
-    - The metadata database is hosted locally on the same machine in this setup.
-  - Worker:
-    - Executes the actual tasks of the DAG. The tasks are processed in parallel using the machine's available resources.
-    - In a single-node setup, there is only one worker, which runs on the same machine as all other components.
-
-- Positve:
-  - Simpler to manage: All components are on one machine, making it easier to deploy, set up, and troubleshoot.
-  - Good for development: Perfect for development or small-scale workflows, where scaling or distributed execution isn’t required.
-- Limitations:
-  - Limited scalability: A single machine can only handle so many tasks simultaneously due to hardware constraints.
-  - Single point of failure: If the machine goes down, all Airflow services stop.
- 
-**Multi-Node Airflow Architecture**
-
-- In a multi-node setup, Airflow components are distributed across different machines. This allows Airflow to handle larger workloads by running multiple workers across multiple machines.
-- This is typically used in production environments where high availability, fault tolerance, and scalability are critical.
-- Core Components:
-  - Webserver (Single Instance):
-    - The user interface remains centralized and usually runs on a dedicated machine, allowing users to monitor workflows.
-    - The Webserver is stateless, so it can run independently without being involved in task execution.
-  - Scheduler (Single Instance or Highly Available Mode):
-    - The Scheduler is responsible for queuing tasks. In a multi-node setup, it runs separately from workers.
-    - In larger setups, you might also set up a highly available mode with multiple schedulers running in active/passive mode to prevent any single point of failure.
-  - Metadata Database (Single Instance):
-    - The centralized database that tracks the state of the tasks and DAGs.
-    - This is usually hosted on a dedicated machine and can be scaled separately using database replication techniques.
-  - Worker (Multiple Instances):
-    - Workers are distributed across different machines (nodes), allowing them to execute tasks in parallel, thereby increasing the processing capacity.
-    - Workers pull tasks from the task queue and execute them. This multi-node worker setup allows you to scale the number of workers based on the workload.
-    - You can use distributed systems like Celery or Kubernetes to manage these workers.
-  - Message Broker (e.g., RabbitMQ, Redis):
-    - In a multi-node setup, tasks are queued in a message broker (like RabbitMQ or Redis) to distribute the load among the workers.
-    - The message broker ensures communication between the Scheduler and the distributed Workers.
-
-- Positive:
-  - Scalability: You can add more worker nodes to handle an increasing workload without overwhelming a single machine.
-  - Fault Tolerance: If one worker node fails, other worker nodes can continue processing tasks, increasing system reliability.
-  - Performance: By distributing tasks across multiple machines, you can process workflows faster, improving throughput.
-- Limitations:
-  - Complexity: Multi-node setups require more configuration and maintenance. Setting up and monitoring multiple nodes and components adds overhead.
-  - Resource Intensive: You’ll need to allocate more resources (multiple machines or cloud instances) to manage the infrastructure.
- 
-  **Use Case Scenarios**
-
-- Single-node: Suitable for small development environments where workflows and tasks are minimal and don't require much scalability.
-- Multi-node: Ideal for production environments with large-scale data pipelines, high availability needs, and distributed task execution requirements.
+Apache Airflow's architecture is fundamental to understanding how it orchestrates complex workflows. At its core, Airflow relies on three key components: the Scheduler, the Webserver, and the Metadata Database. These components work together to define, schedule, execute, and monitor workflows, making Airflow a powerful tool for data engineering and automation. Understanding how these components interact is crucial for effectively using and managing Airflow in any environment, from local development to large-scale production deployments.
 
 #### <a name="chapter1part3.1"></a>Chapter 1 - Part 3.1: Core Components of Airflow
+
+The Airflow architecture is built around three primary components: the Scheduler, the Webserver, and the Metadata Database. Each component plays a distinct role in the overall functioning of the platform.
 
 **The Web Server**
 
@@ -527,7 +470,9 @@ Airflow can run in both single-node and multi-node setups, with each setup havin
   - Why it's useful: Workers are responsible for the actual execution of tasks. Without workers, tasks would not get executed, and DAGs would remain incomplete.
   - Example:
     - A worker processes a task that involves downloading a file from an external API and saving it to a local directory. Once the worker completes the task, it reports success, and the scheduler can trigger the next dependent task.
-   
+
+#### <a name="chapter1part3.2"></a>Chapter 1 - Part 3.2: Interaction Between Components
+
 **Defining pipelines flexibly in (Python) code**
 
 In Airflow, you define your DAGs using Python code in DAG files, which are essentially Python scripts that describe the structure of the corresponding DAG. As such, each DAG file typically describes the set of tasks for a given DAG and the dependencies between the tasks, which are then parsed by Airflow to identify the DAG structure. Other than this, DAG files typically contain some additional metadata about the DAG telling Airflow how and when it should be executed, and so on. We’ll dive into this scheduling more in the next section.
@@ -555,9 +500,83 @@ At a high level, the scheduler runs through the following steps
 
 <br>
 
-#### <a name="chapter1part3.2"></a>Chapter 1 - Part 3.2: Interaction Between Components
+- **DAG Definition**: DAGs are defined in Python files and placed in the DAGs folder.
+- **Scheduler Parsing**: The Scheduler periodically parses these DAG files to identify DAGs and tasks.
+- **Metadata Storage**: The DAG definitions are stored in the Metadata Database.
+- **DAG Run Triggering**: Based on the schedule_interval, the Scheduler triggers DAG runs.
+- **Task Execution**: The Scheduler submits tasks to the Executor for execution.
+- **Status Updates**: The Executor updates the status of tasks in the Metadata Database.
+- **Webserver Monitoring**: The Webserver retrieves DAG and task status from the Metadata Database and displays it in the UI.
+- **User Interaction**: Users can interact with Airflow through the Webserver to monitor DAG runs, view logs, and manage connections and variables.
+
 
 #### <a name="chapter1part3.3"></a>Chapter 1 - Part 3.3: Executors
+
+While not one of the three core components, the Executor is a crucial part of the Airflow architecture. The Executor is responsible for actually running the tasks that the Scheduler assigns to it. Different types of Executors exist, each suited for different environments and workloads. We will cover Executors in more detail in a later module, but it's important to understand their basic role in the overall architecture.
+
+#### <a name="chapter1part3.4"></a>Chapter 1 - Part 3.4: Architectures in Airflow
+
+Airflow can run in both single-node and multi-node setups, with each setup having distinct architectural differences. Here's a breakdown of each architecture:
+
+**Single-Node Airflow Architecture**
+
+- In a single-node setup, all Airflow components (Webserver, Scheduler, Metadata Database, and Worker) run on a single machine.
+- This is typically used for small-scale deployments, testing, or development environments.
+- Core Components:
+  - Webserver:
+    - The web-based user interface (UI) where you can monitor DAGs, view logs, and manage tasks.
+    - In a single-node setup, it runs on the same machine as the other components.
+  - Scheduler:
+    - Responsible for scheduling DAG runs and ensuring tasks are executed based on their defined schedule intervals.
+    - In a single-node architecture, the scheduler runs on the same machine as the webserver and workers.
+  - Metadata Database:
+    - Stores metadata about DAGs, tasks, and their execution history. Airflow uses databases like MySQL or PostgreSQL.
+    - The metadata database is hosted locally on the same machine in this setup.
+  - Worker:
+    - Executes the actual tasks of the DAG. The tasks are processed in parallel using the machine's available resources.
+    - In a single-node setup, there is only one worker, which runs on the same machine as all other components.
+
+- Positve:
+  - Simpler to manage: All components are on one machine, making it easier to deploy, set up, and troubleshoot.
+  - Good for development: Perfect for development or small-scale workflows, where scaling or distributed execution isn’t required.
+- Limitations:
+  - Limited scalability: A single machine can only handle so many tasks simultaneously due to hardware constraints.
+  - Single point of failure: If the machine goes down, all Airflow services stop.
+ 
+**Multi-Node Airflow Architecture**
+
+- In a multi-node setup, Airflow components are distributed across different machines. This allows Airflow to handle larger workloads by running multiple workers across multiple machines.
+- This is typically used in production environments where high availability, fault tolerance, and scalability are critical.
+- Core Components:
+  - Webserver (Single Instance):
+    - The user interface remains centralized and usually runs on a dedicated machine, allowing users to monitor workflows.
+    - The Webserver is stateless, so it can run independently without being involved in task execution.
+  - Scheduler (Single Instance or Highly Available Mode):
+    - The Scheduler is responsible for queuing tasks. In a multi-node setup, it runs separately from workers.
+    - In larger setups, you might also set up a highly available mode with multiple schedulers running in active/passive mode to prevent any single point of failure.
+  - Metadata Database (Single Instance):
+    - The centralized database that tracks the state of the tasks and DAGs.
+    - This is usually hosted on a dedicated machine and can be scaled separately using database replication techniques.
+  - Worker (Multiple Instances):
+    - Workers are distributed across different machines (nodes), allowing them to execute tasks in parallel, thereby increasing the processing capacity.
+    - Workers pull tasks from the task queue and execute them. This multi-node worker setup allows you to scale the number of workers based on the workload.
+    - You can use distributed systems like Celery or Kubernetes to manage these workers.
+  - Message Broker (e.g., RabbitMQ, Redis):
+    - In a multi-node setup, tasks are queued in a message broker (like RabbitMQ or Redis) to distribute the load among the workers.
+    - The message broker ensures communication between the Scheduler and the distributed Workers.
+
+- Positive:
+  - Scalability: You can add more worker nodes to handle an increasing workload without overwhelming a single machine.
+  - Fault Tolerance: If one worker node fails, other worker nodes can continue processing tasks, increasing system reliability.
+  - Performance: By distributing tasks across multiple machines, you can process workflows faster, improving throughput.
+- Limitations:
+  - Complexity: Multi-node setups require more configuration and maintenance. Setting up and monitoring multiple nodes and components adds overhead.
+  - Resource Intensive: You’ll need to allocate more resources (multiple machines or cloud instances) to manage the infrastructure.
+ 
+  **Use Case Scenarios**
+
+- Single-node: Suitable for small development environments where workflows and tasks are minimal and don't require much scalability.
+- Multi-node: Ideal for production environments with large-scale data pipelines, high availability needs, and distributed task execution requirements.
 
 #### <a name="chapter1part4"></a>Chapter 1 - Part 4: Setting up a Local Airflow Environment (using Docker)
 
@@ -1140,8 +1159,102 @@ Using SQLite is generally not recommended for production environments due to its
 
 #### <a name="chapter1part5"></a>Chapter 1 - Part 5: Introduction to the Airflow UI
 
+The Airflow UI is your primary interface for interacting with your Airflow environment. It provides a comprehensive view of your DAGs, tasks, and infrastructure, allowing you to monitor, trigger, and troubleshoot your workflows. Understanding the UI is crucial for effectively managing your data pipelines and ensuring their smooth operation. This lesson will guide you through the key components of the Airflow UI, explaining their functionalities and how to use them to manage your workflows.
+
 #### <a name="chapter1part5.1"></a>Chapter 1 - Part 5.1: Accessing the Airflow UI
+
+After setting up your local Airflow environment using Docker (as covered in the previous lesson), you can access the Airflow UI through your web browser. By default, the Airflow webserver runs on port 8080. Therefore, you can access the UI by navigating to http://localhost:8080 in your browser.
+
+If you configured a different port during the setup process, make sure to use that port instead. Once you access the UI, you'll be prompted to log in. The default credentials are airflow for both username and password. It is crucial to change these default credentials in a production environment for security reasons.
 
 #### <a name="chapter1part5.2"></a>Chapter 1 - Part 5.2: Key Components of the Airflow UI
 
+The Airflow UI is organized into several key sections, each providing specific functionalities for managing your workflows.
+
+**DAGs View**
+
+The DAGs view is the main landing page of the Airflow UI. It provides a list of all DAGs that are currently loaded in your Airflow environment. For each DAG, you can see its current status, schedule, and a summary of recent runs.
+
+- **DAG Name**: The name of the DAG, as defined in your Python code. Clicking on the DAG name will take you to the DAG details page.
+- **Status**: The current status of the DAG, which can be one of the following:
+  - **Running**: The DAG is currently running.
+  - **Success**: The DAG has completed successfully.
+  - **Failed**: The DAG has failed.
+  - **Upstream Failed**: One or more upstream tasks have failed.
+  - **Queued**: The DAG is queued to run.
+  - **Scheduled**: The DAG is scheduled to run in the future.
+  - **Paused**: The DAG is paused and will not be scheduled to run.
+- **Schedule**: The schedule interval for the DAG, defined using a cron expression or a predefined schedule (e.g., @daily, @weekly).
+- **Last Run**: The date and time of the last DAG run.
+- **Next Run**: The date and time of the next scheduled DAG run.
+- **Recent Tasks**: A summary of the status of recent tasks in the DAG, providing a quick overview of the DAG's health.
+- **Actions**: A set of actions that you can perform on the DAG, such as:
+  - **Trigger DAG**: Manually trigger a new DAG run.
+  - **Pause/Unpause DAG**: Pause or unpause the DAG, enabling or disabling its schedule.
+  - **Delete DAG**: Remove the DAG from the Airflow environment (use with caution!).
+  - **Refresh**: Refresh the DAG's status and information.
+ 
+**Example**:
+
+Imagine you have a DAG named process_data_daily that processes data every day at midnight. In the DAGs view, you would see the DAG name, its status (e.g., "Success" if the last run was successful), the schedule (@daily), the last run time, the next run time, and a summary of the recent task statuses.
+
+
+**DAG Details View**
+
+Clicking on a DAG name in the DAGs view will take you to the DAG details view. This view provides a more detailed look at the DAG, including its graph representation, task details, and run history.
+
+- **Graph View**: A visual representation of the DAG, showing the tasks and their dependencies. You can see the status of each task (e.g., success, failed, running, queued) and the dependencies between them.
+- **Task Details**: Clicking on a task in the graph view will display its details, such as its operator type, start time, end time, duration, and logs.
+- **Grid View**: A tabular view of the DAG runs, showing the status of each task in each run. This view is useful for comparing the performance of different DAG runs.
+- **Code View**: Displays the Python code that defines the DAG. This is useful for reviewing the DAG's logic and identifying potential issues.
+- **Run History**: A list of all DAG runs, showing their status, start time, end time, and duration. You can click on a DAG run to view its details.
+
+**Example**:
+
+In the DAG details view for the process_data_daily DAG, you would see a graph showing the tasks involved in processing the data, such as "extract_data", "transform_data", and "load_data". You could click on the "transform_data" task to see its details, such as the Python code that performs the transformation and the logs generated during its execution.
+
+**Task Instance Details**
+
+From the DAG Details view, you can click on a specific task instance (a specific run of a task within a DAG run) to view its details. This provides the most granular level of information about a task's execution.
+
+- **Logs**: The logs generated by the task during its execution. This is the primary source of information for troubleshooting task failures.
+- **Task Attributes**: Information about the task, such as its operator type, retries, start time, end time, duration, and state.
+- **XComs**: (Covered in a later module) Information about data passed between tasks using XComs.
+- **Try Number**: If the task has been retried, this indicates the current retry attempt number.
+
+**Example**:
+
+If the "transform_data" task in the process_data_daily DAG failed, you would examine its logs in the Task Instance Details view to identify the cause of the failure. The logs might show an error message indicating a problem with the data transformation logic.
+
+**Browse Menu**
+
+The "Browse" menu in the Airflow UI provides access to various administrative and monitoring features.
+
+- **DAG Runs**: A list of all DAG runs in the Airflow environment, across all DAGs.
+- **Task Instances**: A list of all task instances in the Airflow environment, across all DAGs and DAG runs.
+- **Code**: Allows you to browse the code files in your Airflow environment, including DAG definitions and custom modules.
+- **Variables**: (Covered in a later module) Allows you to view and manage Airflow variables, which are key-value pairs that can be used to configure DAGs.
+- **Connections**: (Covered in a later module) Allows you to view and manage Airflow connections, which store connection information for external systems such as databases and APIs.
+- **Pools**: Allows you to manage resource pools, which can be used to limit the number of tasks that run concurrently.
+- **Users**: Allows you to manage user accounts and permissions.
+- **Roles**: Allows you to manage user roles and permissions.
+- **Audit Logs**: A log of all actions performed in the Airflow UI, providing an audit trail for security and compliance purposes.
+
+**Admin Menu**
+
+The "Admin" menu provides access to administrative functionalities.
+
+- **Configurations**: Displays the current Airflow configuration settings.
+- **Plugins**: Displays the installed Airflow plugins.
+- **REST API**: Provides information about the Airflow REST API.
+- **Clear Data**: Allows you to clear data from the Airflow metadata database (use with caution!).
+
 #### <a name="chapter1part5.3"></a>Chapter 1 - Part 5.3: Using the Airflow UI for Monitoring and Troubleshooting
+
+The Airflow UI is your primary tool for monitoring the health and performance of your data pipelines. By regularly checking the DAGs view, DAG details view, and task instance details, you can quickly identify and resolve issues.
+
+- **Monitoring DAG Status**: The DAGs view provides a quick overview of the status of all DAGs. Pay attention to DAGs that are in a "Failed" or "Upstream Failed" state.
+- **Examining Task Logs**: When a task fails, the first step is to examine its logs in the Task Instance Details view. The logs will often contain error messages or stack traces that can help you identify the cause of the failure.
+- **Identifying Performance Bottlenecks**: The DAG details view and Grid View can help you identify performance bottlenecks in your DAGs. Look for tasks that take a long time to run or that are frequently retried.
+- **Triggering DAGs Manually**: You can use the "Trigger DAG" button in the DAGs view to manually trigger a DAG run. This is useful for testing changes or for running a DAG on demand.
+- **Clearing Task Instances**: If a task instance is in a failed state and you want to retry it, you can clear it using the "Clear" button in the Task Instance Details view. This will reset the task's state and allow it to be retried.
