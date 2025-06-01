@@ -3,44 +3,139 @@
 # Content
 
 1. [Chapter 1: Introduction to Apache Airflow](#chapter1)
-  - [Chapter 1 - Part 1: What is Apache Airflow and why use it?](#chapter1part1)
-    - [Chapter 1 - Part 1.1: What is Apache Airflow?](#chapter1part1.1)
-    - [Chapter 1 - Part 1.2: Why Use Apache Airflow?](#chapter1part1.2)
-    - [Chapter 1 - Part 1.3: Real-World Applications](#chapter1part1.3)
-  - [Chapter 1 - Part 2: Understanding DAGs, Tasks, and Operators](#chapter1part2)
-    - [Chapter 1 - Part 2.1: Directed Acyclic Graphs (DAGs)](#chapter1part2.1)
-    - [Chapter 1 - Part 2.2: Tasks](#chapter1part2.2)
-    - [Chapter 1 - Part 2.3: Operators](#chapter1part2.3)
-    - [Chapter 1 - Part 2.4: Real-World Application](#chapter1part2.4)
-  - [Chapter 1 - Part 3: Airflow Architecture: Scheduler, Webserver, and Metadata Database](#chapter1part3)
-    - [Chapter 1 - Part 3.1: Core Components of Airflow](#chapter1part3.1)
-    - [Chapter 1 - Part 3.2: Interaction Between Components](#chapter1part3.2)
-    - [Chapter 1 - Part 3.3: Executors](#chapter1part3.3)
-  - [Chapter 1 - Part 4: Setting up a Local Airflow Environment (using Docker)](#chapter1part4)
-    - [Chapter 1 - Part 4.1: Understanding Docker for Airflow](#chapter1part4.1)
-    - [Chapter 1 - Part 4.2: Prerequisites](#chapter1part4.2)
-    - [Chapter 1 - Part 4.3: Setting Up Airflow with Docker Compose](#chapter1part4.3)
-    - [Chapter 1 - Part 4.4: Customizing Your Airflow Environment](#chapter1part4.4)
-    - [Chapter 1 - Part 4.5: Troubleshooting Common Issues](#chapter1part4.5)
-  - [Chapter 1 - Part 5: Introduction to the Airflow UI](#chapter1part5)
-    - [Chapter 1 - Part 5.1: Accessing the Airflow UI](#chapter1part5.1)
-    - [Chapter 1 - Part 5.2: Key Components of the Airflow UI](#chapter1part5.2)
-    - [Chapter 1 - Part 5.3: Using the Airflow UI for Monitoring and Troubleshooting](#chapter1part5.3)
-    - [Chapter 1 - Part 5.4: Practice Activities](#chapter1part5.4)
+    - [Chapter 1 - Part 1: What is Apache Airflow and why use it?](#chapter1part1)
+      - [Chapter 1 - Part 1.1: What is Apache Airflow?](#chapter1part1.1)
+      - [Chapter 1 - Part 1.2: Why Use Apache Airflow?](#chapter1part1.2)
+      - [Chapter 1 - Part 1.3: Real-World Applications](#chapter1part1.3)
+    - [Chapter 1 - Part 2: Understanding DAGs, Tasks, and Operators](#chapter1part2)
+      - [Chapter 1 - Part 2.1: Directed Acyclic Graphs (DAGs)](#chapter1part2.1)
+      - [Chapter 1 - Part 2.2: Tasks](#chapter1part2.2)
+      - [Chapter 1 - Part 2.3: Operators](#chapter1part2.3)
+      - [Chapter 1 - Part 2.4: Workflow](#chapter1part2.4)
+    - [Chapter 1 - Part 3: Airflow Architecture: Scheduler, Webserver, and Metadata Database](#chapter1part3)
+      - [Chapter 1 - Part 3.1: Core Components of Airflow](#chapter1part3.1)
+      - [Chapter 1 - Part 3.2: Interaction Between Components](#chapter1part3.2)
+      - [Chapter 1 - Part 3.3: Executors](#chapter1part3.3)
+    - [Chapter 1 - Part 4: Setting up a Local Airflow Environment (using Docker)](#chapter1part4)
+      - [Chapter 1 - Part 4.1: Understanding Docker for Airflow](#chapter1part4.1)
+      - [Chapter 1 - Part 4.2: Prerequisites](#chapter1part4.2)
+      - [Chapter 1 - Part 4.3: Setting Up Airflow with Docker Compose](#chapter1part4.3)
+      - [Chapter 1 - Part 4.4: Customizing Your Airflow Environment](#chapter1part4.4)
+      - [Chapter 1 - Part 4.5: Troubleshooting Common Issues](#chapter1part4.5)
+    - [Chapter 1 - Part 5: Introduction to the Airflow UI](#chapter1part5)
+      - [Chapter 1 - Part 5.1: Accessing the Airflow UI](#chapter1part5.1)
+      - [Chapter 1 - Part 5.2: Key Components of the Airflow UI](#chapter1part5.2)
+      - [Chapter 1 - Part 5.3: Using the Airflow UI for Monitoring and Troubleshooting](#chapter1part5.3)
+      - [Chapter 1 - Part 5.4: Practice Activities](#chapter1part5.4)
   
 ## <a name="chapter1"></a>Chapter 1: Introduction to Apache Airflow
 
 #### <a name="chapter1part1"></a>Chapter 1 - Part 1: What is Apache Airflow and why use it?
 
+Apache Airflow has become a cornerstone in modern data engineering, enabling teams to orchestrate complex workflows with reliability and scalability. Understanding what Airflow is and why it's used is crucial for anyone looking to build and manage data pipelines effectively. This lesson will provide a comprehensive introduction to Airflow, covering its core functionalities, benefits, and use cases, setting the stage for more advanced topics in subsequent modules.
+
 #### <a name="chapter1part1.1"></a>Chapter 1 - Part 1.1: What is Apache Airflow?
+
+Apache Airflow is an open-source workflow management platform for data engineering pipelines. It allows you to programmatically author, schedule, and monitor workflows. In simpler terms, Airflow helps you define a series of tasks and their dependencies, ensuring they are executed in the correct order and at the right time.
+
+**Key Concepts**
+
+- **Workflows (DAGs)**: Airflow represents workflows as Directed Acyclic Graphs (DAGs). A DAG is a collection of tasks organized to reflect their dependencies. "Directed" means the tasks have a specific order, "Acyclic" means there are no loops (a task cannot depend on itself, directly or indirectly), and "Graph" represents the connections between tasks.
+- **Tasks**: A task represents a single unit of work within a DAG. It could be anything from running a Python script to executing a SQL query or transferring data between systems.
+- **Operators**: Operators are pre-built task templates that encapsulate common actions. Airflow provides a variety of operators for interacting with different systems and services, such as BashOperator for executing shell commands, PythonOperator for running Python functions, and operators for interacting with cloud platforms like AWS, Google Cloud, and Azure.
+- **Scheduling**: Airflow allows you to schedule DAGs to run at specific intervals (e.g., daily, hourly) or based on external triggers.
+- **Monitoring**: Airflow provides a web-based UI for monitoring the status of DAGs and tasks, viewing logs, and troubleshooting issues.
+
+**Example: A Simple Data Pipeline**
+
+Imagine a scenario where you need to:
+
+- Extract data from a database.
+- Transform the data (e.g., clean, aggregate).
+- Load the transformed data into a data warehouse.
+
+Using Airflow, you can define a DAG with three tasks:
+
+- ```extract_data```: Executes a SQL query to extract data from the database.
+- ```transform_data```: Runs a Python script to transform the extracted data.
+- ```load_data```: Loads the transformed data into the data warehouse.
+
+You would also define the dependencies between these tasks, ensuring that transform_data runs only after extract_data completes successfully, and load_data runs only after transform_data completes successfully. Airflow would then schedule and execute this DAG according to your defined schedule, monitoring the status of each task and alerting you to any failures.
 
 #### <a name="chapter1part1.2"></a>Chapter 1 - Part 1.2: Why Use Apache Airflow?
 
+Airflow addresses several key challenges in building and managing data pipelines:
+
+**1. Workflow Orchestration**
+
+Airflow provides a centralized platform for orchestrating complex workflows, ensuring that tasks are executed in the correct order and at the right time. This eliminates the need for manual scheduling and coordination, reducing the risk of errors and improving efficiency.
+
+Example: Consider a marketing analytics pipeline that requires data from multiple sources (e.g., website analytics, CRM, social media) to be combined and processed before generating reports. Airflow can orchestrate this entire process, ensuring that data is extracted from each source, transformed, and loaded into a central data warehouse in a timely and reliable manner.
+
+**2. Scalability and Reliability**
+
+Airflow is designed to handle large-scale workflows with thousands of tasks. It can be deployed on a variety of infrastructure, including cloud platforms like AWS, Google Cloud, and Azure, allowing you to scale your workflows as needed. Airflow also provides built-in fault tolerance, ensuring that workflows continue to run even if individual tasks fail.
+
+Example: An e-commerce company might use Airflow to process millions of transactions daily, generating personalized recommendations for customers. Airflow's scalability ensures that the pipeline can handle the increasing volume of data as the company grows.
+
+**3. Monitoring and Alerting**
+
+Airflow provides a web-based UI for monitoring the status of DAGs and tasks, viewing logs, and troubleshooting issues. It also supports alerting, allowing you to receive notifications when tasks fail or when other issues occur. This enables you to quickly identify and resolve problems, minimizing downtime and ensuring data quality.
+
+Example: A financial services company might use Airflow to monitor its fraud detection pipeline, receiving alerts when suspicious transactions are detected. This allows them to quickly investigate and prevent fraudulent activity.
+
+**4. Code as Configuration**
+
+Airflow allows you to define workflows as code, using Python. This provides several benefits:
+
+- **Version Control**: Workflows can be stored in version control systems like Git, allowing you to track changes and collaborate with other developers.
+- **Testability**: Workflows can be tested using standard Python testing frameworks, ensuring that they are reliable and accurate.
+- **Reusability**: Workflows can be easily reused and adapted for different purposes.
+
+Example: A data science team might use Airflow to define a machine learning pipeline as code, allowing them to easily version control, test, and reuse the pipeline for different models and datasets.
+
+**5. Extensibility**
+
+Airflow is highly extensible, allowing you to create custom operators and hooks for interacting with different systems and services. This makes it easy to integrate Airflow with your existing infrastructure and tools.
+
+Example: A research institution might develop custom Airflow operators for interacting with specialized scientific instruments or data repositories.
+
 #### <a name="chapter1part1.3"></a>Chapter 1 - Part 1.3: Real-World Applications
+
+Here are some real-world examples of how Airflow is used:
+
+- **Data Warehousing**: Orchestrating the extraction, transformation, and loading (ETL) of data into a data warehouse.
+- **Machine Learning**: Building and deploying machine learning models, including data preprocessing, model training, and model evaluation.
+- **Business Intelligence**: Generating reports and dashboards for business users.
+- **Financial Services**: Automating financial processes, such as fraud detection and risk management.
+- **E-commerce**: Personalizing customer experiences and optimizing marketing campaigns.
+
+**Hypothetical Scenario**
+
+Imagine a small startup that provides a subscription-based service. They need to analyze user behavior to improve their product and marketing efforts. They have data scattered across various sources:
+
+- User activity logs stored in cloud storage (e.g., AWS S3).
+- Subscription data in a relational database (e.g., PostgreSQL).
+- Marketing campaign data from a third-party API.
+
+Without Airflow, they might rely on manual scripts or ad-hoc processes to collect and analyze this data. This is prone to errors, difficult to scale, and lacks proper monitoring.
+
+With Airflow, they can define a DAG that automates the entire process:
+
+- **Extract**: Extract data from S3, PostgreSQL, and the marketing API using appropriate Airflow operators (e.g., S3Hook, PostgresOperator, SimpleHttpOperator - which we will cover in later modules).
+- **Transform**: Clean and transform the data using Python scripts executed with the PythonOperator. This might involve tasks like data validation, aggregation, and feature engineering.
+- **Load**: Load the transformed data into a data warehouse (e.g., Snowflake, BigQuery) using a dedicated operator.
+- **Analyze**: Trigger a data analysis script or notebook to generate insights and reports.
+
+This Airflow DAG ensures that the data is processed consistently, reliably, and on a schedule. The startup can monitor the pipeline's progress, receive alerts for any failures, and easily scale the pipeline as their data volume grows.
 
 #### <a name="chapter1part2"></a>Chapter 1 - Part 2: Understanding DAGs, Tasks, and Operators
 
+Understanding DAGs, Tasks, and Operators is fundamental to grasping how Apache Airflow works. These three components are the building blocks of any workflow you'll create in Airflow. A DAG defines the overall structure, Tasks represent individual units of work, and Operators determine what that work actually is. Without a solid understanding of these concepts, building and managing complex data pipelines with Airflow becomes significantly more challenging. This lesson will provide a comprehensive overview of DAGs, Tasks, and Operators, equipping you with the knowledge to design and implement effective workflows.
+
 #### <a name="chapter1part2.1"></a>Chapter 1 - Part 2.1: Directed Acyclic Graphs (DAGs)
+
+A DAG, or Directed Acyclic Graph, is the core concept in Airflow. It represents a workflow, a collection of tasks you want to run, organized in a way that reflects their dependencies.
 
 **DAG (Directed Acyclic Grapsh)**
 
@@ -67,7 +162,142 @@ So you have those directed dependencies, and you know that in order to execute T
 
 Because you have a loop. You can see that T4 depends on t1, t2, t3, but T1 also depends on T4. So you have a loop like an infinite loop. And this is not an acyclic graph.
 
-**Operator**
+**What "Directed Acyclic Graph" Means**
+
+- **Directed**: The graph has direction. This means the connections between tasks have a specific order. Task A might depend on Task B, indicating that Task B must complete successfully before Task A can start. This directionality defines the flow of execution.
+- **Acyclic**: The graph cannot have cycles. This means you can't have a situation where Task A depends on Task B, Task B depends on Task C, and Task C depends on Task A. Such a cycle would create an infinite loop, making it impossible to determine the execution order.
+- **Graph**: In this context, a graph is a collection of nodes (Tasks) and edges (dependencies) that define the relationships between those nodes.
+
+**DAG Definition in Airflow**
+
+In Airflow, a DAG is defined using Python code. This code specifies the tasks to be executed and their dependencies. The Airflow scheduler reads this code and uses it to orchestrate the execution of the workflow.
+
+**Example of a Simple DAG**
+
+Here's a basic example of a DAG definition:
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='simple_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example']
+) as dag:
+    # Define a task that executes a Bash command
+    task1 = BashOperator(
+        task_id='print_date',
+        bash_command='date'
+    )
+
+    # Define another task
+    task2 = BashOperator(
+        task_id='sleep',
+        bash_command='sleep 5'
+    )
+
+    # Define task dependencies
+    task1 >> task2 # task1 will run before task2
+```
+
+In this example:
+
+- We import the necessary modules from Airflow.
+- We create a DAG object, providing a dag_id, start_date, schedule_interval, catchup and tags.
+  - ```dag_id``` is a unique identifier for the DAG.
+  - ```start_date``` specifies the date from which the DAG should start running.
+  - ```schedule_interval``` defines how often the DAG should be triggered (e.g., daily, weekly). None means the DAG will only be triggered manually.
+  - ```catchup``` is a boolean that determines whether Airflow should run the DAG for all missed intervals between the start_date and the current date.
+  - ```tags``` are labels that can be used to categorize and filter DAGs in the Airflow UI.
+- We define two tasks, task1 and task2, using the BashOperator. Each task is given a task_id and a bash_command to execute.
+- We define the dependency between the tasks using the >> operator. This indicates that task1 must complete successfully before task2 can start.
+
+**DAG Attributes**
+
+DAGs have several important attributes that control their behavior:
+
+- ```dag_id```: A unique identifier for the DAG. This is used to identify the DAG in the Airflow UI and when triggering DAG runs.
+- ```start_date```: The date from which the DAG should start running. Airflow uses this to determine which DAG runs to schedule.
+- ```schedule_interval```: Defines how often the DAG should be triggered. This can be a cron expression (e.g., '0 0 * * *' for daily at midnight), a timedelta object (e.g., timedelta(days=1) for daily), or a preset schedule (e.g., '@daily' for daily).
+- ```catchup```: A boolean that determines whether Airflow should run the DAG for all missed intervals between the start_date and the current date. Setting this to False is generally recommended for production DAGs to avoid overwhelming the system with backdated runs.
+- ```tags```: A list of tags that can be used to categorize and filter DAGs in the Airflow UI.
+- ```default_args```: A dictionary of default arguments that will be passed to all tasks in the DAG. This can be used to set default values for parameters like retries, retry_delay, and owner.
+
+**Real-World Examples of DAGs**
+
+- **Data Ingestion Pipeline**: A DAG could be used to ingest data from various sources (e.g., APIs, databases, files), transform it, and load it into a data warehouse. Each task in the DAG could represent a specific step in the ingestion process, such as extracting data from an API, cleaning the data, and loading it into a database.
+- **Machine Learning Model Training**: A DAG could be used to automate the process of training and deploying a machine learning model. Tasks could include fetching training data, preprocessing the data, training the model, evaluating the model, and deploying the model to a production environment.
+- **Hypothetical Scenario**: E-commerce Order Processing: Imagine an e-commerce platform. A DAG could automate the order processing workflow. Tasks might include:
+  - Receiving order information from the website.
+  - Checking inventory levels.
+  - Processing payment.
+  - Sending order confirmation email to the customer.
+  - Updating the shipping system.
+
+#### <a name="chapter1part2.2"></a>Chapter 1 - Part 2.2: Tasks
+
+- A task is a specific instance of an operator. When an operator is assigned to a Dag, it becomes a task.
+- Tasks are the actual units of work that get executed when your Dag runs.
+
+Tasks represent individual units of work within a DAG. Each task performs a specific operation, such as executing a script, running a database query, or transferring data.
+
+**Task Definition**
+
+In Airflow, tasks are defined using Operators. An Operator is a template for a specific type of task. When you instantiate an Operator, you create a task.
+
+**Task Attributes**
+
+Tasks have several important attributes:
+
+- ```task_id```: A unique identifier for the task within the DAG. This is used to identify the task in the Airflow UI and when defining task dependencies.
+- ```dag```: The DAG to which the task belongs. This is automatically set when you define a task within a DAG context (using the with DAG(...) as dag: syntax).
+- ```owner```: The owner of the task. This is typically the user or team responsible for maintaining the task.
+- ```retries```: The number of times the task should be retried if it fails.
+- ```retry_delay```: The amount of time to wait between retries.
+- ```start_date```: The date from which the task should start running.
+- ```end_date```: The date when the task should stop running.
+- ```depends_on_past```: If set to True, keeps a task from getting triggered if the previous schedule's task did not succeed.
+- ```wait_for_downstream```: If set to True, an instance's previous tasks have to be done for their upstream tasks to get triggered.
+- ```priority_weight```: Allows relative priorities for tasks amongst all DAGs.
+- ```weight_rule```: Weight Rules for assessing task successes.
+
+**Task Dependencies**
+
+Task dependencies define the order in which tasks should be executed. You can define dependencies using the >> (downstream) and << (upstream) operators.
+
+- ```task1 >> task2```: This means that task1 must complete successfully before task2 can start.
+- ```task2 << task1```: This is equivalent to task1 >> task2.
+- ```[task1, task2] >> task3```: This means that both task1 and task2 must complete successfully before task3 can start.
+- ```task1 >> [task2, task3]```: This means that task1 must complete successfully before both task2 and task3 can start.
+
+**Task States**
+
+Tasks can be in one of several states:
+
+- ```queued```: The task is waiting to be executed.
+- ```running```: The task is currently being executed.
+- ```success```: The task completed successfully.
+- ```failed```: The task failed to complete.
+- ```skipped```: The task was skipped because a dependency failed or because the task was explicitly skipped.
+- ```up_for_retry```: The task failed but will be retried.
+- ```up_for_reschedule```: The task is waiting for a sensor to complete.
+
+**Real-World Examples of Tasks**
+
+- **Data Transformation**: A task could be used to transform data from one format to another (e.g., CSV to JSON).
+- **Database Query**: A task could be used to execute a SQL query against a database.
+- **API Call**: A task could be used to make a call to an external API.
+- **Hypothetical Scenario**: Social Media Analytics: Imagine a company analyzing social media trends. Tasks could include:
+  - Fetching data from Twitter API.
+  - Cleaning and pre-processing the text data.
+  - Performing sentiment analysis.
+  - Storing the results in a database.
+
+#### <a name="chapter1part2.3"></a>Chapter 1 - Part 2.3: Operators
 
 - An operator defines a single, ideally idempotent task in your Dag (Idempotent means that you can run this task, this operator as many times as you want for the same input.)
 - Operators allow you to break down your workflow into discrete, manageable pieces of work.
@@ -77,24 +307,6 @@ Because you have a loop. You can see that T4 depends on t1, t2, t3, but T1 also 
   - The SQLExecuteQueryOperator to execute a SQL query to a database
   - The FileSensor to wait for a file
  
-**Task/Task Instance**
-
-- A task is a specific instance of an operator. When an operator is assigned to a Dag, it becomes a task.
-- Tasks are the actual units of work that get executed when your Dag runs.
-
-**Workflow**
-
-- A workflow is the entire process defined by your Dag, including all tasks and their dependencies.
-- It represents your entire data pipeline showing how all the pieces fit together to achieve your goal
-
-<br>
-
-<div align="center"><img src="img/workflow-w812-h762.png" width=812 height=762><br><sub>Example of a Workflow - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
-
-<br>
-
-When the BashOperator runs, for example, in 1 of janary of 2024, it becomes a Task Instance (TI)
-
 **Tasks vs. operators**
 
 Operators provide the implementation of a piece of work. Airflow has a class called BaseOperator and many subclasses inheriting from the BaseOperator, such as PythonOperator, EmailOperator, and OracleOperator. Tasks in Airflow manage the execution of an operator;
@@ -106,13 +318,77 @@ they can be thought of as a small wrapper or manager around an operator that ens
 - **Operator**: PythonOperator defines the action of running a Python function.
 - **Task**: When you assign the PythonOperator to a DAG, it becomes a task, like process_data_task, and represents the specific step of running that Python function in the workflow.
 
-Scheduling and executing pipelines
+Operators are the building blocks of tasks in Airflow. They are pre-built templates that encapsulate common operations, such as executing a Bash command, running a Python function, or transferring data between systems.
 
-#### <a name="chapter1part2.2"></a>Chapter 1 - Part 2.2: Tasks
+**Types of Operators**
 
-#### <a name="chapter1part2.3"></a>Chapter 1 - Part 2.3: Operators
+Airflow provides a wide range of operators for different purposes. Some of the most commonly used operators include:
 
-#### <a name="chapter1part2.4"></a>Chapter 1 - Part 2.4: Real-World Application
+- ```BashOperator```: Executes a Bash command.
+- ```PythonOperator```: Executes a Python function.
+- ```EmailOperator```: Sends an email.
+- ```SimpleHttpOperator```: Makes an HTTP request.
+- ```PostgresOperator```: Executes a SQL command in a Postgres database.
+- ```MySqlOperator```: Executes a SQL command in a MySQL database.
+- ```S3FileTransferOperator```: Transfers files between local storage and Amazon S3.
+- ```SFTPOperator```: Transfers files to and from SFTP servers.
+- ```Sensor```: A special type of operator that waits for a certain condition to be met before proceeding.
+
+**Using Operators**
+
+To use an operator, you need to instantiate it and provide the required parameters. The parameters vary depending on the operator.
+
+**Example of Using the BashOperator**
+
+```py
+from airflow.operators.bash import BashOperator
+
+task = BashOperator(
+    task_id='my_bash_task',
+    bash_command='echo "Hello, World!"'
+)
+```
+
+In this example, we create a BashOperator task that executes the command echo "Hello, World!". The task_id is set to my_bash_task.
+
+**Example of Using the PythonOperator**
+
+```py
+from airflow.operators.python import PythonOperator
+
+def my_python_function():
+    print("Hello from Python!")
+
+task = PythonOperator(
+    task_id='my_python_task',
+    python_callable=my_python_function
+)
+```
+
+In this example, we create a PythonOperator task that executes the function my_python_function. The task_id is set to my_python_task, and the python_callable parameter is set to the function to be executed.
+
+**Real-World Examples of Operators**
+
+- **Data Extraction**: Using SimpleHttpOperator to extract data from a REST API.
+- **Database Operations**: Using PostgresOperator to create tables, insert data, or run complex queries.
+- **File Transfers**: Using S3FileTransferOperator to move data between your local file system and AWS S3.
+- **Hypothetical Scenario**: Online Advertising Campaign: Imagine automating an online advertising campaign. Operators could be used for:
+  - ```SimpleHttpOperator```: Fetching campaign performance data from ad platforms (Google Ads, Facebook Ads).
+  - ```PythonOperator```: Processing the data and generating reports.
+  - ```EmailOperator```: Sending the reports to stakeholders.
+ 
+#### <a name="chapter1part2.4"></a>Chapter 1 - Part 2.4: Workflow
+
+- A workflow is the entire process defined by your Dag, including all tasks and their dependencies.
+- It represents your entire data pipeline showing how all the pieces fit together to achieve your goal
+
+<br>
+
+<div align="center"><img src="img/workflow-w812-h762.png" width=812 height=762><br><sub>Example of a Workflow - (<a href='https://github.com/vitorstabile'>Work by Vitor Garcia</a>) </sub></div>
+
+<br>
+
+When the BashOperator runs, for example, in 1 of janary of 2024, it becomes a Task Instance (TI)
 
 #### <a name="chapter1part3"></a>Chapter 1 - Part 3: Airflow Architecture: Scheduler, Webserver, and Metadata Database
 
