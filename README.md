@@ -27,7 +27,137 @@
       - [Chapter 1 - Part 5.1: Accessing the Airflow UI](#chapter1part5.1)
       - [Chapter 1 - Part 5.2: Key Components of the Airflow UI](#chapter1part5.2)
       - [Chapter 1 - Part 5.3: Using the Airflow UI for Monitoring and Troubleshooting](#chapter1part5.3)
-      - [Chapter 1 - Part 5.4: Practice Activities](#chapter1part5.4)
+2. [Chapter 2: Building Your First DAG](#chapter2)
+    - [Chapter 2 - Part 1: Defining a Simple DAG: A "Hello World" Example](#chapter2part1)
+      - [Chapter 2 - Part 1.1: Understanding the Basic Structure of a DAG](#chapter2part1.1)
+      - [Chapter 2 - Part 1.2: Practical Examples and Demonstrations](#chapter2part1.2)
+    - [Chapter 2 - Part 2: Understanding Task Dependencies and Workflow Orchestration](#chapter2part2)
+      - [Chapter 2 - Part 2.1: Defining Task Dependencies](#chapter2part2.1)
+      - [Chapter 2 - Part 2.2: Workflow Orchestration](#chapter2part2.2)
+      - [Chapter 2 - Part 2.3: Real-World Application](#chapter2part2.3)
+    - [Chapter 2 - Part 3: Using BashOperator for Simple Commands](#chapter2part3)
+      - [Chapter 2 - Part 3.1: Understanding the BashOperator](#chapter2part3.1)
+      - [Chapter 2 - Part 3.2: Practical Examples and Demonstrations](#chapter2part3.2)
+      - [Chapter 2 - Part 3.3: Best Practices](#chapter2part3.3)
+    - [Chapter 2 - Part 4: Defining DAG Schedules and Catchup](#chapter2part4)
+      - [Chapter 2 - Part 4.1: Understanding DAG Schedules](#chapter2part4.1)
+      - [Chapter 2 - Part 4.2: Understanding Catchup](#chapter2part4.2)
+      - [Chapter 2 - Part 4.3: Practical Examples and Demonstrations](#chapter2part4.3)
+    - [Chapter 2 - Part 5: Running and Monitoring Your DAG in the Airflow UI](#chapter2part5)
+      - [Chapter 2 - Part 5.1: Accessing the Airflow UI](#chapter2part5.1)
+      - [Chapter 2 - Part 5.2: Understanding the DAGs View](#chapter2part5.2)
+      - [Chapter 2 - Part 5.3: Exploring the DAG Details View](#chapter2part5.3)
+      - [Chapter 2 - Part 5.4: Triggering DAG Runs](#chapter2part5.4)
+      - [Chapter 2 - Part 5.5: Monitoring DAG Runs](#chapter2part5.5)
+      - [Chapter 2 - Part 5.6: Common Use Cases for the Airflow UI](#chapter2part5.6)
+      - [Chapter 2 - Part 5.7: Practical Examples](#chapter2part5.7)
+      - [Chapter 2 - Part 5.8: Real-World Application](#chapter2part5.8)
+3. [Chapter 3: Core Airflow Operator](#chapter3)
+    - [Chapter 3 - Part 1: Introduction to Common Operators: PythonOperator, EmailOperator](#chapter3part1)
+      - [Chapter 3 - Part 1.1: PythonOperator: Executing Python Code](#chapter3part1.1)
+      - [Chapter 3 - Part 1.2: EmailOperator: Sending Email Notifications](#chapter3part1.2)
+    - [Chapter 3 - Part 2: Working with Data Transfer Operators: S3Hook and S3FileTransferOperator](#chapter3part2)
+      - [Chapter 3 - Part 2.1: Understanding S3Hook](#chapter3part2.1)
+      - [Chapter 3 - Part 2.2: Understanding S3FileTransferOperator](#chapter3part2.2)
+      - [Chapter 3 - Part 2.3: Real-World Application](#chapter3part2.3)
+    - [Chapter 3 - Part 3: Using the PostgresOperator to Interact with Databases](#chapter3part3)
+      - [Chapter 3 - Part 3.1: Understanding the PostgresOperator](#chapter3part3.1)
+      - [Chapter 3 - Part 3.2: Advanced Usage and Best Practices](#chapter3part3.2)
+    - [Chapter 3 - Part 4: Understanding Idempotency and Task Retries](#chapter3part4)
+      - [Chapter 3 - Part 4.1: Understanding Idempotency](#chapter3part4.1)
+      - [Chapter 3 - Part 4.2: Understanding Task Retries](#chapter3part4.2)
+      - [Chapter 3 - Part 4.3: Real-World Application](#chapter3part4.3)
+    - [Chapter 3 - Part 5: Best Practices for Operator Usage](#chapter3part5)
+      - [Chapter 3 - Part 5.1: Understanding Operator Idempotency](#chapter3part5.1)
+      - [Chapter 3 - Part 5.2: Configuring Task Retries](#chapter3part5.2)
+      - [Chapter 3 - Part 5.3: Choosing the Right Operator](#chapter3part5.3)
+4. [Chapter 4: Variables and Connections](#chapter4)
+    - [Chapter 4 - Part 1: Introduction to Airflow Variables](#chapter4part1)
+      - [Chapter 4 - Part 1.1: Understanding Airflow Variables](#chapter4part1.1)
+      - [Chapter 4 - Part 1.2: Setting and Retrieving Variables](#chapter4part1.2)
+      - [Chapter 4 - Part 1.3: Practical Examples](#chapter4part1.3)
+    - [Chapter 4 - Part 2: Setting and Retrieving Variables in the UI and DAGs](#chapter4part2)
+      - [Chapter 4 - Part 2.1: Understanding Airflow Variables](#chapter4part2.1)
+      - [Chapter 4 - Part 2.2: Setting Variables in the Airflow UI](#chapter4part2.2)
+      - [Chapter 4 - Part 2.3: Retrieving Variables in DAGs](#chapter4part2.3)
+      - [Chapter 4 - Part 2.4: Best Practices for Using Variables](#chapter4part2.4)
+    - [Chapter 4 - Part 3: Understanding Airflow Connections](#chapter4part3)
+      - [Chapter 4 - Part 3.1: Understanding Airflow Connections](#chapter4part3.1)
+      - [Chapter 4 - Part 3.2: Best Practices for Using Connections](#chapter4part3.2)
+    - [Chapter 4 - Part 4: Configuring Connections for Databases, APIs, and Cloud Services](#chapter4part4)
+      - [Chapter 4 - Part 4.1: Understanding Airflow Connections](#chapter4part4.1)
+      - [Chapter 4 - Part 4.2: Configuring Connections](#chapter4part4.2)
+      - [Chapter 4 - Part 4.3: Using Connections in DAGs](#chapter4part4.3)
+      - [Chapter 4 - Part 4.4: Connection Examples for Different Services](#chapter4part4.4)
+      - [Chapter 4 - Part 4.5: Practice Activities](#chapter4part4.5)
+    - [Chapter 4 - Part 5: Using Variables and Connections for Secure Configuration Management](#chapter4part5)
+      - [Chapter 4 - Part 5.1: Understanding the Need for Secure Configuration Management](#chapter4part5.1)
+      - [Chapter 4 - Part 5.2: Airflow Variables: Dynamic Configuration Options](#chapter4part5.2)
+      - [Chapter 4 - Part 5.3: Airflow Connections: Securely Storing Credentials](#chapter4part5.3)
+      - [Chapter 4 - Part 5.4: Using Variables and Connections Together](#chapter4part5.4)
+      - [Chapter 4 - Part 5.5: Practice Activities](#chapter4part5.5)
+5. [Chapter 5: Advanced DAG Concepts](#chapter5)
+    - [Chapter 5 - Part 1: SubDAGs and TaskGroups for Modular DAG Design](#chapter5part1)
+      - [Chapter 5 - Part 1.1: Understanding SubDAGs](#chapter5part1.1)
+      - [Chapter 5 - Part 1.2: Understanding TaskGroups](#chapter5part1.2)
+      - [Chapter 5 - Part 1.3: SubDAGs vs. TaskGroups: A Comparison](#chapter5part1.3)
+      - [Chapter 5 - Part 1.4: Practical Examples and Demonstrations](#chapter5part1.4)
+    - [Chapter 5 - Part 2: Using BranchPythonOperator for Conditional Logic](#chapter5part2)
+      - [Chapter 5 - Part 2.1: Understanding the BranchPythonOperator](#chapter5part2.1)
+    - [Chapter 5 - Part 3: Dynamic DAG Generation with Python](#chapter5part3)
+      - [Chapter 5 - Part 3.1: Understanding Dynamic DAG Generation](#chapter5part3.1)
+      - [Chapter 5 - Part 3.2: Implementing Dynamic DAG Generation](#chapter5part3.2)
+    - [Chapter 5 - Part 4: Understanding XComs for Inter-Task Communication](#chapter5part4)
+      - [Chapter 5 - Part 4.1: Understanding XComs](#chapter5part4.1)
+    - [Chapter 5 - Part 5: Implementing Error Handling and Alerting](#chapter5part5)
+      - [Chapter 5 - Part 5.1: Understanding Error Handling in Airflow](#chapter5part5.1)
+6. [Chapter 6: Airflow Sensors](#chapter6)
+    - [Chapter 6 - Part 1: Introduction to Airflow Sensors](#chapter6part1)
+      - [Chapter 6 - Part 1.1: Understanding Airflow Sensors](#chapter6part1.1)
+      - [Chapter 6 - Part 1.2: Types of Airflow Sensors](#chapter6part1.2)
+      - [Chapter 6 - Part 1.3: Sensor Parameters](#chapter6part1.3)
+      - [Chapter 6 - Part 1.4: Practical Examples](#chapter6part1.4)
+      - [Chapter 6 - Part 1.5: Best Practices for Using Sensors](#chapter6part1.5)
+    - [Chapter 6 - Part 2: Using FileSensor to wait for file arrival](#chapter6part2)
+      - [Chapter 6 - Part 2.1: Understanding the FileSensor](#chapter6part2.1)
+    - [Chapter 6 - Part 3: Using HttpSensor to check for API availability](#chapter6part3)
+      - [Chapter 6 - Part 3.1: Understanding the HttpSensor](#chapter6part3.1)
+      - [Chapter 6 - Part 3.2: Best Practices for Using HttpSensor](#chapter6part3.2)
+    - [Chapter 6 - Part 4: Creating Custom Sensors](#chapter6part4)
+      - [Chapter 6 - Part 4.1: Understanding Custom Sensors](#chapter6part4.1)
+      - [Chapter 6 - Part 4.2: Advanced Custom Sensors](#chapter6part4.2)
+      - [Chapter 6 - Part 4.3: Best Practices for Custom Sensors](#chapter6part4.3)
+      - [Chapter 6 - Part 4.4: Real-World Application](#chapter6part4.4)
+    - [Chapter 6 - Part 5: Best practices for using Sensors](#chapter6part5)
+      - [Chapter 6 - Part 5.1: Sensor Timeouts and Failure Modes](#chapter6part5.1)
+      - [Chapter 6 - Part 5.2: Sensor Modes: Poke vs. Deferrable](#chapter6part5.2)
+      - [Chapter 6 - Part 5.3: Optimizing Sensor Performance](#chapter6part5.3)
+      - [Chapter 6 - Part 5.4: Best Practices for Sensor Design](#chapter6part5.4)
+7. [Chapter 7: Deploying Airflow to Production](#chapter7)
+    - [Chapter 7 - Part 1: Choosing a Deployment Strategy: Kubernetes, Docker Compose, Managed Services](#chapter7part1)
+      - [Chapter 7 - Part 1.1: Deployment Strategies for Apache Airflow](#chapter7part1.1)
+      - [Chapter 7 - Part 1.2: Choosing the Right Strategy](#chapter7part1.2)
+      - [Chapter 7 - Part 1.3: Practice Activities](#chapter7part1.3)
+    - [Chapter 7 - Part 2: Configuring Airflow for Production: Database, Executor, Logging](#chapter7part2)
+      - [Chapter 7 - Part 2.1: Database Configuration](#chapter7part2.1)
+      - [Chapter 7 - Part 2.2: Executor Configuration](#chapter7part2.2)
+      - [Chapter 7 - Part 2.3: Logging Configuration](#chapter7part2.3)
+    - [Chapter 7 - Part 3: Implementing Monitoring and Alerting](#chapter7part3)
+      - [Chapter 7 - Part 3.1: Key Monitoring Metrics](#chapter7part3.1)
+      - [Chapter 7 - Part 3.2: Tools for Monitoring Airflow](#chapter7part3.2)
+      - [Chapter 7 - Part 3.3: Implementing Alerting](#chapter7part3.3)
+      - [Chapter 7 - Part 3.4: Best Practices for Monitoring and Alerting](#chapter7part3.4)
+    - [Chapter 7 - Part 4: Understanding Airflow Security Best Practices](#chapter7part4)
+      - [Chapter 7 - Part 4.1: Authentication and Authorization](#chapter7part4.1)
+      - [Chapter 7 - Part 4.2: Encryption](#chapter7part4.2)
+      - [Chapter 7 - Part 4.3: Network Security](#chapter7part4.3)
+      - [Chapter 7 - Part 4.4: Other Security Considerations](#chapter7part4.4)
+    - [Chapter 7 - Part 5: Scaling Airflow for High Availability](#chapter7part5)
+      - [Chapter 7 - Part 5.1: Understanding High Availability and Scalability in Airflow](#chapter7part5.1)
+      - [Chapter 7 - Part 5.2: Architectures for Scaling Airflow](#chapter7part5.2)
+      - [Chapter 7 - Part 5.3: Configuring Airflow for High Availability](#chapter7part5.3)
+      - [Chapter 7 - Part 5.4: Implementing Monitoring and Alerting](#chapter7part5.4)
+      - [Chapter 7 - Part 5.5: Airflow Security Best Practices](#chapter7part5.5)
   
 ## <a name="chapter1"></a>Chapter 1: Introduction to Apache Airflow
 
@@ -1258,3 +1388,265 @@ The Airflow UI is your primary tool for monitoring the health and performance of
 - **Identifying Performance Bottlenecks**: The DAG details view and Grid View can help you identify performance bottlenecks in your DAGs. Look for tasks that take a long time to run or that are frequently retried.
 - **Triggering DAGs Manually**: You can use the "Trigger DAG" button in the DAGs view to manually trigger a DAG run. This is useful for testing changes or for running a DAG on demand.
 - **Clearing Task Instances**: If a task instance is in a failed state and you want to retry it, you can clear it using the "Clear" button in the Task Instance Details view. This will reset the task's state and allow it to be retried.
+
+## <a name="chapter2"></a>Chapter 2: Building Your First DAG
+
+#### <a name="chapter2part1"></a>Chapter 2 - Part 1: Defining a Simple DAG: A "Hello World" Example
+
+#### <a name="chapter2part1.1"></a>Chapter 2 - Part 1.1: Understanding the Basic Structure of a DAG
+
+#### <a name="chapter2part1.2"></a>Chapter 2 - Part 1.2: Practical Examples and Demonstrations
+
+#### <a name="chapter2part2"></a>Chapter 2 - Part 2: Understanding Task Dependencies and Workflow Orchestration
+
+#### <a name="chapter2part2.1"></a>Chapter 2 - Part 2.1: Defining Task Dependencies
+
+#### <a name="chapter2part2.2"></a>Chapter 2 - Part 2.2: Workflow Orchestration
+
+#### <a name="chapter2part2.3"></a>Chapter 2 - Part 2.3: Real-World Application
+
+#### <a name="chapter2part3"></a>Chapter 2 - Part 3: Using BashOperator for Simple Commands
+
+#### <a name="chapter2part3.1"></a>Chapter 2 - Part 3.1: Understanding the BashOperator
+
+#### <a name="chapter2part3.2"></a>Chapter 2 - Part 3.2: Practical Examples and Demonstrations
+
+#### <a name="chapter2part3.3"></a>Chapter 2 - Part 3.3: Best Practices
+
+#### <a name="chapter2part4"></a>Chapter 2 - Part 4: Defining DAG Schedules and Catchup
+
+#### <a name="chapter2part4.1"></a>Chapter 2 - Part 4.1: Understanding DAG Schedules
+
+#### <a name="chapter2part4.2"></a>Chapter 2 - Part 4.2: Understanding Catchup
+
+#### <a name="chapter2part4.3"></a>Chapter 2 - Part 4.3: Practical Examples and Demonstrations
+
+#### <a name="chapter2part5"></a>Chapter 2 - Part 5: Running and Monitoring Your DAG in the Airflow UI
+
+#### <a name="chapter2part5.1"></a>Chapter 2 - Part 5.1: Accessing the Airflow UI
+
+#### <a name="chapter2part5.2"></a>Chapter 2 - Part 5.2: Understanding the DAGs View
+
+#### <a name="chapter2part5.3"></a>Chapter 2 - Part 5.3: Exploring the DAG Details View
+
+#### <a name="chapter2part5.4"></a>Chapter 2 - Part 5.4: Triggering DAG Runs
+
+#### <a name="chapter2part5.5"></a>Chapter 2 - Part 5.5: Monitoring DAG Runs
+
+#### <a name="chapter2part5.6"></a>Chapter 2 - Part 5.6: Common Use Cases for the Airflow UI
+
+#### <a name="chapter2part5.7"></a>Chapter 2 - Part 5.7: Practical Examples
+
+#### <a name="chapter2part5.8"></a>Chapter 2 - Part 5.8: Real-World Application
+
+## <a name="chapter3"></a>Chapter 3: Core Airflow Operator
+
+#### <a name="chapter3part1"></a>Chapter 3 - Part 1: Introduction to Common Operators: PythonOperator, EmailOperator
+
+#### <a name="chapter3part1.1"></a>Chapter 3 - Part 1.1: PythonOperator: Executing Python Code
+
+#### <a name="chapter3part1.2"></a>Chapter 3 - Part 1.2: EmailOperator: Sending Email Notifications
+
+#### <a name="chapter3part2"></a>Chapter 3 - Part 2: Working with Data Transfer Operators: S3Hook and S3FileTransferOperator
+
+#### <a name="chapter3part2.1"></a>Chapter 3 - Part 2.1: Understanding S3Hook
+
+#### <a name="chapter3part2.2"></a>Chapter 3 - Part 2.2: Understanding S3FileTransferOperator
+
+#### <a name="chapter3part2.3"></a>Chapter 3 - Part 2.3: Real-World Application
+
+#### <a name="chapter3part3"></a>Chapter 3 - Part 3: Using the PostgresOperator to Interact with Databases
+
+#### <a name="chapter3part3.1"></a>Chapter 3 - Part 3.1: Understanding the PostgresOperator
+
+#### <a name="chapter3part3.2"></a>Chapter 3 - Part 3.2: Advanced Usage and Best Practices
+
+#### <a name="chapter3part4"></a>Chapter 3 - Part 4: Understanding Idempotency and Task Retries
+
+#### <a name="chapter3part4.1"></a>Chapter 3 - Part 4.1: Understanding Idempotency
+
+#### <a name="chapter3part4.2"></a>Chapter 3 - Part 4.2: Understanding Task Retries
+
+#### <a name="chapter3part4.3"></a>Chapter 3 - Part 4.3: Real-World Application
+
+#### <a name="chapter3part5"></a>Chapter 3 - Part 5: Best Practices for Operator Usage
+
+#### <a name="chapter3part5.1"></a>Chapter 3 - Part 5.1: Understanding Operator Idempotency
+
+#### <a name="chapter3part5.2"></a>Chapter 3 - Part 5.2: Configuring Task Retries
+
+#### <a name="chapter3part5.3"></a>Chapter 3 - Part 5.3: Choosing the Right Operator
+
+## <a name="chapter4"></a>Chapter 4: Variables and Connections
+
+#### <a name="chapter4part1"></a>Chapter 4 - Part 1: Introduction to Airflow Variables
+
+#### <a name="chapter4part1.1"></a>Chapter 4 - Part 1.1: Understanding Airflow Variables
+
+#### <a name="chapter4part1.2"></a>Chapter 4 - Part 1.2: Setting and Retrieving Variables
+
+#### <a name="chapter4part1.3"></a>Chapter 4 - Part 1.3: Practical Examples
+
+#### <a name="chapter4part2"></a>Chapter 4 - Part 2: Setting and Retrieving Variables in the UI and DAGs
+
+#### <a name="chapter4part2.1"></a>Chapter 4 - Part 2.1: Understanding Airflow Variables
+
+#### <a name="chapter4part2.2"></a>Chapter 4 - Part 2.2: Setting Variables in the Airflow UI
+
+#### <a name="chapter4part2.3"></a>Chapter 4 - Part 2.3: Retrieving Variables in DAGs
+
+#### <a name="chapter4part2.4"></a>Chapter 4 - Part 2.4: Best Practices for Using Variables
+
+#### <a name="chapter4part3"></a>Chapter 4 - Part 3: Understanding Airflow Connections
+
+#### <a name="chapter4part3.1"></a>Chapter 4 - Part 3.1: Understanding Airflow Connections
+
+#### <a name="chapter4part3.2"></a>Chapter 4 - Part 3.2: Best Practices for Using Connections
+
+#### <a name="chapter4part4"></a>Chapter 4 - Part 4: Configuring Connections for Databases, APIs, and Cloud Services
+
+#### <a name="chapter4part4.1"></a>Chapter 4 - Part 4.1: Understanding Airflow Connections
+
+#### <a name="chapter4part4.2"></a>Chapter 4 - Part 4.2: Configuring Connections
+
+#### <a name="chapter4part4.3"></a>Chapter 4 - Part 4.3: Using Connections in DAGs
+
+#### <a name="chapter4part4.4"></a>Chapter 4 - Part 4.4: Connection Examples for Different Services
+
+#### <a name="chapter4part4.5"></a>Chapter 4 - Part 4.5: Practice Activities
+
+#### <a name="chapter4part5"></a>Chapter 4 - Part 5: Using Variables and Connections for Secure Configuration Management
+
+#### <a name="chapter4part5.1"></a>Chapter 4 - Part 5.1: Understanding the Need for Secure Configuration Management
+
+#### <a name="chapter4part5.2"></a>Chapter 4 - Part 5.2: Airflow Variables: Dynamic Configuration Options
+
+#### <a name="chapter4part5.3"></a>Chapter 4 - Part 5.3: Airflow Connections: Securely Storing Credentials
+
+#### <a name="chapter4part5.4"></a>Chapter 4 - Part 5.4: Using Variables and Connections Together
+
+#### <a name="chapter4part5.5"></a>Chapter 4 - Part 5.5: Practice Activities
+
+## <a name="chapter5"></a>Chapter 5: Advanced DAG Concepts
+
+#### <a name="chapter5part1"></a>Chapter 5 - Part 1: SubDAGs and TaskGroups for Modular DAG Design
+
+#### <a name="chapter5part1.1"></a>Chapter 5 - Part 1.1: Understanding SubDAGs
+
+#### <a name="chapter5part1.2"></a>Chapter 5 - Part 1.2: Understanding TaskGroups
+
+#### <a name="chapter5part1.3"></a>Chapter 5 - Part 1.3: SubDAGs vs. TaskGroups: A Comparison
+
+#### <a name="chapter5part1.4"></a>Chapter 5 - Part 1.4: Practical Examples and Demonstrations
+
+#### <a name="chapter5part2"></a>Chapter 5 - Part 2: Using BranchPythonOperator for Conditional Logic
+
+#### <a name="chapter5part2.1"></a>Chapter 5 - Part 2.1: Understanding the BranchPythonOperator
+
+#### <a name="chapter5part3"></a>Chapter 5 - Part 3: Dynamic DAG Generation with Python
+
+#### <a name="chapter5part3.1"></a>Chapter 5 - Part 3.1: Understanding Dynamic DAG Generation
+
+#### <a name="chapter5part3.2"></a>Chapter 5 - Part 3.2: Implementing Dynamic DAG Generation
+
+#### <a name="chapter5part4"></a>Chapter 5 - Part 4: Understanding XComs for Inter-Task Communication
+
+#### <a name="chapter5part4.1"></a>Chapter 5 - Part 4.1: Understanding XComs
+
+#### <a name="chapter5part5"></a>Chapter 5 - Part 5: Implementing Error Handling and Alerting
+
+#### <a name="chapter5part5.1"></a>Chapter 5 - Part 5.1: Understanding Error Handling in Airflow
+
+## <a name="chapter6"></a>Chapter 6: Airflow Sensors
+
+#### <a name="chapter6part1"></a>Chapter 6 - Part 1: Introduction to Airflow Sensors
+
+#### <a name="chapter6part1.1"></a>Chapter 6 - Part 1.1: Understanding Airflow Sensors
+
+#### <a name="chapter6part1.2"></a>Chapter 6 - Part 1.2: Types of Airflow Sensors
+
+#### <a name="chapter6part1.3"></a>Chapter 6 - Part 1.3: Sensor Parameters
+
+#### <a name="chapter6part1.4"></a>Chapter 6 - Part 1.4: Practical Examples
+
+#### <a name="chapter6part1.5"></a>Chapter 6 - Part 1.5: Best Practices for Using Sensors
+
+#### <a name="chapter6part2"></a>Chapter 6 - Part 2: Using FileSensor to wait for file arrival
+
+#### <a name="chapter6part2.1"></a>Chapter 6 - Part 2.1: Understanding the FileSensor
+
+#### <a name="chapter6part3"></a>Chapter 6 - Part 3: Using HttpSensor to check for API availability
+
+#### <a name="chapter6part3.1"></a>Chapter 6 - Part 3.1: Understanding the HttpSensor
+
+#### <a name="chapter6part3.2"></a>Chapter 6 - Part 3.2: Best Practices for Using HttpSensor
+
+#### <a name="chapter6part4"></a>Chapter 6 - Part 4: Creating Custom Sensors
+
+#### <a name="chapter6part4.1"></a>Chapter 6 - Part 4.1: Understanding Custom Sensors
+
+#### <a name="chapter6part4.2"></a>Chapter 6 - Part 4.2: Advanced Custom Sensors
+
+#### <a name="chapter6part4.3"></a>Chapter 6 - Part 4.3: Best Practices for Custom Sensors
+
+#### <a name="chapter6part4.4"></a>Chapter 6 - Part 4.4: Real-World Application
+
+#### <a name="chapter6part5"></a>Chapter 6 - Part 5: Best practices for using Sensors
+
+#### <a name="chapter6part5.1"></a>Chapter 6 - Part 5.1: Sensor Timeouts and Failure Modes
+
+#### <a name="chapter6part5.2"></a>Chapter 6 - Part 5.2: Sensor Modes: Poke vs. Deferrable
+
+#### <a name="chapter6part5.3"></a>Chapter 6 - Part 5.3: Optimizing Sensor Performance
+
+#### <a name="chapter6part5.4"></a>Chapter 6 - Part 5.4: Best Practices for Sensor Design
+
+## <a name="chapter7"></a>Chapter 7: Deploying Airflow to Production
+
+#### <a name="chapter7part1"></a>Chapter 7 - Part 1: Choosing a Deployment Strategy: Kubernetes, Docker Compose, Managed Services
+
+#### <a name="chapter7part1.1"></a>Chapter 7 - Part 1.1: Deployment Strategies for Apache Airflow
+
+#### <a name="chapter7part1.2"></a>Chapter 7 - Part 1.2: Choosing the Right Strategy
+
+#### <a name="chapter7part1.3"></a>Chapter 7 - Part 1.3: Practice Activities
+
+#### <a name="chapter7part2"></a>Chapter 7 - Part 2: Configuring Airflow for Production: Database, Executor, Logging
+
+#### <a name="chapter7part2.1"></a>Chapter 7 - Part 2.1: Database Configuration
+
+#### <a name="chapter7part2.2"></a>Chapter 7 - Part 2.2: Executor Configuration
+
+#### <a name="chapter7part2.3"></a>Chapter 7 - Part 2.3: Logging Configuration
+
+#### <a name="chapter7part3"></a>Chapter 7 - Part 3: Implementing Monitoring and Alerting
+
+#### <a name="chapter7part3.1"></a>Chapter 7 - Part 3.1: Key Monitoring Metrics
+
+#### <a name="chapter7part3.2"></a>Chapter 7 - Part 3.2: Tools for Monitoring Airflow
+
+#### <a name="chapter7part3.3"></a>Chapter 7 - Part 3.3: Implementing Alerting
+
+#### <a name="chapter7part3.4"></a>Chapter 7 - Part 3.4: Best Practices for Monitoring and Alerting
+
+#### <a name="chapter7part4"></a>Chapter 7 - Part 4: Understanding Airflow Security Best Practices
+
+#### <a name="chapter7part4.1"></a>Chapter 7 - Part 4.1: Authentication and Authorization
+
+#### <a name="chapter7part4.2"></a>Chapter 7 - Part 4.2: Encryption
+
+#### <a name="chapter7part4.3"></a>Chapter 7 - Part 4.3: Network Security
+
+#### <a name="chapter7part4.4"></a>Chapter 7 - Part 4.4: Other Security Considerations
+
+#### <a name="chapter7part5"></a>Chapter 7 - Part 5: Scaling Airflow for High Availability
+
+#### <a name="chapter7part5.1"></a>Chapter 7 - Part 5.1: Understanding High Availability and Scalability in Airflow
+
+#### <a name="chapter7part5.2"></a>Chapter 7 - Part 5.2: Architectures for Scaling Airflow
+
+#### <a name="chapter7part5.3"></a>Chapter 7 - Part 5.3: Configuring Airflow for High Availability
+
+#### <a name="chapter7part5.4"></a>Chapter 7 - Part 5.4: Implementing Monitoring and Alerting
+
+#### <a name="chapter7part5.5"></a>Chapter 7 - Part 5.5: Airflow Security Best Practices
