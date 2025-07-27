@@ -50,8 +50,6 @@
       - [Chapter 2 - Part 5.4: Triggering DAG Runs](#chapter2part5.4)
       - [Chapter 2 - Part 5.5: Monitoring DAG Runs](#chapter2part5.5)
       - [Chapter 2 - Part 5.6: Common Use Cases for the Airflow UI](#chapter2part5.6)
-      - [Chapter 2 - Part 5.7: Practical Examples](#chapter2part5.7)
-      - [Chapter 2 - Part 5.8: Real-World Application](#chapter2part5.8)
 3. [Chapter 3: Core Airflow Operator](#chapter3)
     - [Chapter 3 - Part 1: Introduction to Common Operators: PythonOperator, EmailOperator](#chapter3part1)
       - [Chapter 3 - Part 1.1: PythonOperator: Executing Python Code](#chapter3part1.1)
@@ -1393,51 +1391,1006 @@ The Airflow UI is your primary tool for monitoring the health and performance of
 
 #### <a name="chapter2part1"></a>Chapter 2 - Part 1: Defining a Simple DAG: A "Hello World" Example
 
+Defining a DAG is the foundational step in using Apache Airflow. A DAG, or Directed Acyclic Graph, represents a workflow, a series of tasks you want to execute. This lesson will guide you through creating a simple "Hello World" DAG, introducing you to the core concepts and syntax required to define your own workflows. We'll cover the essential components of a DAG, including defining tasks and setting dependencies, laying the groundwork for more complex workflows in later lessons.
+
 #### <a name="chapter2part1.1"></a>Chapter 2 - Part 1.1: Understanding the Basic Structure of a DAG
+
+A DAG in Airflow is defined using Python code. The code specifies the tasks to be executed and their dependencies. Let's break down the fundamental components:
+
+- **DAG Definition**: The DAG() object is the entry point for defining your workflow. It encapsulates all the tasks and their relationships.
+- **Tasks**: Tasks represent individual units of work. They are defined using Operators (e.g., BashOperator, PythonOperator).
+- **Task Dependencies**: Dependencies define the order in which tasks are executed. You can specify that a task should run only after another task has completed successfully.
+
+**DAG Definition with Context Manager**
+
+The most common and recommended way to define a DAG is using a context manager (with DAG(...) as dag:). This approach automatically associates tasks defined within the with block with the DAG.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='hello_world_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,  # Set to None for manual triggering
+    catchup=False,
+    tags=['example']
+) as dag:
+    # Define tasks within this block
+    pass # Placeholder for tasks
+```
+
+Let's break down the parameters used in the DAG() constructor:
+
+- **dag_id**: A unique identifier for your DAG. This is how Airflow identifies and manages your workflow.
+- **start_date**: The date from which Airflow will start scheduling DAG runs. It's crucial to set this correctly, especially when using schedules.
+- **schedule_interval**: Defines how often the DAG should run. None means the DAG will only be triggered manually. Other options include cron expressions (e.g., "0 0 * * *") or predefined schedules like "@daily". We'll explore scheduling in more detail in a later lesson.
+- **catchup**: Determines whether Airflow should backfill DAG runs for past dates if the start_date is in the past. Setting it to False prevents backfilling.
+- **tags**: A list of tags that can be used to categorize and filter DAGs in the Airflow UI.
+
+**Defining Tasks Using Operators**
+
+Operators are the building blocks of Airflow DAGs. They represent a single, ideally idempotent, task. The BashOperator is a simple operator that executes a bash command.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='hello_world_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example']
+) as dag:
+    # Define a task that executes a bash command
+    hello_task = BashOperator(
+        task_id='hello_task',
+        bash_command='echo "Hello, World!"'
+    )
+```
+
+In this example:
+
+- **task_id**: A unique identifier for the task within the DAG.
+- **bash_command**: The bash command to be executed.
+
+**Setting Task Dependencies**
+
+Task dependencies define the order in which tasks are executed. Airflow provides several ways to define dependencies:
+
+- **Using the >> operator**: This is the most common and readable way to define dependencies. It indicates that the task on the left should run before the task on the right.
+- **Using the << operator**: This is the reverse of the >> operator. It indicates that the task on the right should run before the task on the left.
+- **Using the set_upstream() method**: This method explicitly sets a task as a dependency of another task.
+- **Using the set_downstream() method**: This method explicitly sets a task as a dependent of another task.
+
+Let's add another task and define a dependency:
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='hello_world_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example']
+) as dag:
+    # Define a task that executes a bash command
+    hello_task = BashOperator(
+        task_id='hello_task',
+        bash_command='echo "Hello, World!"'
+    )
+
+    # Define another task
+    goodbye_task = BashOperator(
+        task_id='goodbye_task',
+        bash_command='echo "Goodbye, World!"'
+    )
+
+    # Define the task dependency: hello_task runs before goodbye_task
+    hello_task >> goodbye_task
+```
+
+This code defines two tasks: hello_task and goodbye_task. The hello_task >> goodbye_task line specifies that hello_task must complete successfully before goodbye_task can start.
 
 #### <a name="chapter2part1.2"></a>Chapter 2 - Part 1.2: Practical Examples and Demonstrations
 
+Let's explore some more practical examples to solidify your understanding.
+
+**Example 1: Printing the Current Date**
+
+This example demonstrates how to use the BashOperator to print the current date.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='date_printer_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example']
+) as dag:
+    # Define a task that prints the current date
+    print_date = BashOperator(
+        task_id='print_date',
+        bash_command='date'
+    )
+```
+
+This DAG defines a single task, print_date, which executes the date command in bash.
+
+**Example 2: Creating a Directory and a File**
+
+This example demonstrates how to create a directory and a file using the BashOperator.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='create_directory_and_file_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example']
+) as dag:
+    # Define a task that creates a directory
+    create_directory = BashOperator(
+        task_id='create_directory',
+        bash_command='mkdir -p /tmp/my_directory'
+    )
+
+    # Define a task that creates a file inside the directory
+    create_file = BashOperator(
+        task_id='create_file',
+        bash_command='touch /tmp/my_directory/my_file.txt'
+    )
+
+    # Define the task dependency: create_directory runs before create_file
+    create_directory >> create_file
+```
+
+This DAG defines two tasks: create_directory and create_file. The create_directory task creates a directory named /tmp/my_directory. The create_file task creates a file named /tmp/my_directory/my_file.txt inside the directory. The dependency ensures that the directory is created before the file.
+
+**Example 3: Using Multiple Dependencies**
+
+This example demonstrates how to define multiple dependencies for a task.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='multiple_dependencies_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example']
+) as dag:
+    # Define three tasks
+    task_1 = BashOperator(
+        task_id='task_1',
+        bash_command='echo "Task 1"'
+    )
+
+    task_2 = BashOperator(
+        task_id='task_2',
+        bash_command='echo "Task 2"'
+    )
+
+    task_3 = BashOperator(
+        task_id='task_3',
+        bash_command='echo "Task 3"'
+    )
+
+    # Define dependencies: task_1 and task_2 run before task_3
+    [task_1, task_2] >> task_3
+```
+
+In this example, task_3 depends on both task_1 and task_2. This means that task_3 will only start after both task_1 and task_2 have completed successfully.
+
 #### <a name="chapter2part2"></a>Chapter 2 - Part 2: Understanding Task Dependencies and Workflow Orchestration
+
+Understanding task dependencies and workflow orchestration is crucial for building robust and reliable data pipelines in Airflow. It allows you to define the order in which tasks should be executed, ensuring that data is processed correctly and efficiently. Without proper dependency management, tasks might run out of order, leading to errors or incorrect results. This lesson will delve into the core concepts of task dependencies and workflow orchestration, providing you with the knowledge to design and implement complex workflows effectively.
 
 #### <a name="chapter2part2.1"></a>Chapter 2 - Part 2.1: Defining Task Dependencies
 
+Task dependencies define the order in which tasks within a DAG are executed. Airflow uses these dependencies to determine the execution order, ensuring that tasks are run only when their prerequisites are met. This is essential for data pipelines where the output of one task is often the input for another.
+
+**Basic Dependencies**
+
+The simplest way to define dependencies is using the set_upstream() and set_downstream() methods. These methods establish a direct relationship between two tasks, indicating which task must complete before the other can start.
+
+Example:
+
+```py
+from airflow import DAG
+from airflow.operators.bash_operator import BashOperator
+from datetime import datetime
+
+with DAG('basic_dependencies', start_date=datetime(2023, 1, 1), schedule_interval=None, catchup=False) as dag:
+    task_1 = BashOperator(
+        task_id='task_1',
+        bash_command='echo "Task 1 running"'
+    )
+
+    task_2 = BashOperator(
+        task_id='task_2',
+        bash_command='echo "Task 2 running"'
+    )
+
+    task_3 = BashOperator(
+        task_id='task_3',
+        bash_command='echo "Task 3 running"'
+    )
+
+    # Define dependencies
+    task_1.set_downstream(task_2)  # Task 2 depends on Task 1
+    task_2.set_downstream(task_3)  # Task 3 depends on Task 2
+```
+
+In this example, task_2 will only run after task_1 completes successfully, and task_3 will only run after task_2 completes. This creates a linear dependency chain.
+
+**Using Bitshift Operators**
+
+Airflow also supports using bitshift operators (>> and <<) to define dependencies, which can make DAG definitions more readable, especially for complex workflows.
+
+Example:
+
+```py
+from airflow import DAG
+from airflow.operators.bash_operator import BashOperator
+from datetime import datetime
+
+with DAG('bitshift_dependencies', start_date=datetime(2023, 1, 1), schedule_interval=None, catchup=False) as dag:
+    task_1 = BashOperator(
+        task_id='task_1',
+        bash_command='echo "Task 1 running"'
+    )
+
+    task_2 = BashOperator(
+        task_id='task_2',
+        bash_command='echo "Task 2 running"'
+    )
+
+    task_3 = BashOperator(
+        task_id='task_3',
+        bash_command='echo "Task 3 running"'
+    )
+
+    # Define dependencies using bitshift operators
+    task_1 >> task_2 >> task_3  # Equivalent to task_1.set_downstream(task_2) and task_2.set_downstream(task_3)
+```
+
+The >> operator means "downstream of," so task_1 >> task_2 means task_2 depends on task_1.
+
+**Multiple Dependencies**
+
+Tasks can have multiple upstream and downstream dependencies, allowing for more complex workflow structures.
+
+Example:
+
+```py
+from airflow import DAG
+from airflow.operators.bash_operator import BashOperator
+from datetime import datetime
+
+with DAG('multiple_dependencies', start_date=datetime(2023, 1, 1), schedule_interval=None, catchup=False) as dag:
+    task_1 = BashOperator(
+        task_id='task_1',
+        bash_command='echo "Task 1 running"'
+    )
+
+    task_2 = BashOperator(
+        task_id='task_2',
+        bash_command='echo "Task 2 running"'
+    )
+
+    task_3 = BashOperator(
+        task_id='task_3',
+        bash_command='echo "Task 3 running"'
+    )
+
+    task_4 = BashOperator(
+        task_id='task_4',
+        bash_command='echo "Task 4 running"'
+    )
+
+    # Define multiple dependencies
+    task_1 >> [task_2, task_3]  # Task 2 and Task 3 depend on Task 1
+    [task_2, task_3] >> task_4  # Task 4 depends on both Task 2 and Task 3
+```
+
+In this example, task_2 and task_3 both depend on task_1, and task_4 depends on both task_2 and task_3. This means that task_2 and task_3 can run in parallel after task_1 completes, and task_4 will only run after both task_2 and task_3 have finished successfully.
+
+**Conditional Dependencies (Brief Introduction)**
+
+While a full discussion of conditional dependencies belongs in a later lesson, it's important to briefly mention that Airflow provides mechanisms for creating conditional workflows where the execution path depends on the outcome of a task. This is typically achieved using the BranchPythonOperator, which allows you to define different downstream tasks based on a Python function's return value. We will explore this in more detail in Module 5.
+
 #### <a name="chapter2part2.2"></a>Chapter 2 - Part 2.2: Workflow Orchestration
+
+Workflow orchestration involves managing and coordinating the execution of tasks within a DAG to achieve a specific goal. It encompasses defining task dependencies, scheduling DAG runs, monitoring task status, and handling failures. Airflow's scheduler plays a central role in workflow orchestration by ensuring that tasks are executed in the correct order and at the appropriate time.
+
+**Scheduling and Triggering DAGs**
+
+Airflow allows you to schedule DAGs to run automatically at specific intervals using the schedule_interval parameter. This parameter can be defined using cron expressions or predefined schedules like @daily or @weekly. Alternatively, DAGs can be triggered manually through the Airflow UI or via the Airflow API. We will explore DAG schedules in more detail in the next lesson.
+
+**Monitoring Task Status**
+
+The Airflow UI provides a comprehensive view of DAG and task status, allowing you to monitor the progress of your workflows. You can see which tasks are running, which have succeeded, and which have failed. The UI also provides logs for each task, which can be invaluable for debugging issues.
+
+**Handling Task Failures**
+
+Airflow provides several mechanisms for handling task failures, including retries and error handling. You can configure the number of retries for a task using the retries parameter, and Airflow will automatically retry the task if it fails. You can also define custom error handling logic using callbacks or by implementing exception handling within your tasks. We will explore error handling in more detail in Module 5.
 
 #### <a name="chapter2part2.3"></a>Chapter 2 - Part 2.3: Real-World Application
 
+Consider an e-commerce company that needs to process daily sales data. The workflow might involve the following tasks:
+
+- **Extract**: Extract sales data from various sources (e.g., databases, APIs).
+- **Transform**: Clean and transform the data into a consistent format.
+- **Load**: Load the transformed data into a data warehouse for analysis.
+- **Report**: Generate daily sales reports.
+
+These tasks have clear dependencies: the transformation task depends on the extraction task, the loading task depends on the transformation task, and the reporting task depends on the loading task. Airflow can be used to orchestrate this workflow, ensuring that each task is executed in the correct order and that any failures are handled appropriately.
+
+Another example is a financial institution that needs to calculate risk metrics daily. The workflow might involve:
+
+- **Fetch Market Data**: Retrieve the latest stock prices, interest rates, and other market data.
+- **Calculate Risk Factors**: Compute various risk factors based on the market data.
+- **Aggregate Risk Metrics**: Combine the risk factors to calculate overall risk metrics for different portfolios.
+- **Generate Reports**: Produce risk reports for management and regulatory compliance.
+
+Again, Airflow can orchestrate this workflow, ensuring data accuracy and timely report generation.
+
+A hypothetical scenario involves a research team analyzing climate data. Their workflow might include:
+
+- **Download Data**: Download climate data from various sources.
+- **Process Data**: Clean and process the downloaded data.
+- **Run Simulations**: Run climate simulations using the processed data.
+- **Analyze Results**: Analyze the simulation results and generate visualizations.
+
+Airflow can manage the dependencies between these tasks, ensuring that simulations are run only after the data has been properly processed and that results are analyzed only after the simulations have completed.
+
 #### <a name="chapter2part3"></a>Chapter 2 - Part 3: Using BashOperator for Simple Commands
+
+The BashOperator is a fundamental tool in Airflow for executing shell commands. It allows you to integrate external scripts, utilities, and system-level operations directly into your data pipelines. Understanding how to use the BashOperator effectively is crucial for automating tasks such as data processing, file manipulation, and system administration within your workflows. This lesson will provide a comprehensive guide to using the BashOperator, covering its parameters, common use cases, and best practices.
 
 #### <a name="chapter2part3.1"></a>Chapter 2 - Part 3.1: Understanding the BashOperator
 
+The BashOperator in Airflow is designed to execute bash commands or scripts. It's a simple yet powerful operator that bridges the gap between your Airflow DAG and the underlying operating system.
+
+**Key Parameters**
+
+The BashOperator has several important parameters that control its behavior:
+
+- **task_id (required)**: A unique identifier for the task within the DAG. This is how Airflow tracks and manages the task.
+- **bash_command (required)**: The bash command or script to be executed. This can be a simple command like echo "Hello, world!" or a more complex script.
+- **env (optional)**: A dictionary of environment variables to be set for the bash command. This allows you to pass configuration values or secrets to the script.
+- **append_env (optional)**: If True, the env variables are appended to the existing environment. If False (default), the existing environment is replaced.
+- **cwd (optional)**: The working directory to execute the bash command in. If not specified, the default working directory is used.
+- **xcom_push (optional)**: If True, the standard output of the bash command is pushed to XCom, allowing it to be used by downstream tasks. We will cover XComs in more detail in a later module.
+- **output_encoding (optional)**: Encoding of the standard output. Defaults to 'utf-8'.
+- **skip_exit_code (optional)**: Exit code(s) that will be regarded as success.
+- **do_xcom_push_fn (optional)**: A callable to determine whether or not to push stdout to XCom.
+
+**Basic Usage**
+
+The most basic usage of the BashOperator involves specifying a task_id and a bash_command.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='bash_operator_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define a BashOperator task
+    print_date = BashOperator(
+        task_id='print_date',
+        bash_command='date'
+    )
+
+    # Define another BashOperator task
+    print_hello = BashOperator(
+        task_id='print_hello',
+        bash_command='echo "Hello, world!"'
+    )
+
+    print_date >> print_hello # Define task dependency
+```
+
+In this example, we define two BashOperator tasks: print_date and print_hello. The print_date task executes the date command, and the print_hello task executes the echo "Hello, world!" command. The >> operator defines a task dependency, ensuring that print_date runs before print_hello.
+
+**Using Environment Variables**
+
+You can pass environment variables to the bash command using the env parameter. This is useful for configuring the behavior of the script or passing sensitive information.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='bash_operator_env_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define a BashOperator task with environment variables
+    print_env = BashOperator(
+        task_id='print_env',
+        bash_command='echo "The value of MY_VAR is: $MY_VAR"',
+        env={'MY_VAR': 'Airflow is awesome!'}
+    )
+```
+
+In this example, we define a BashOperator task that prints the value of the MY_VAR environment variable. The env parameter is a dictionary that maps the variable name to its value.
+
+**Setting the Working Directory**
+
+The cwd parameter allows you to specify the working directory for the bash command. This is useful when the script needs to access files in a specific directory.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+import os
+
+with DAG(
+    dag_id='bash_operator_cwd_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Create a dummy file in a temporary directory
+    temp_dir = '/tmp/airflow_test'
+    os.makedirs(temp_dir, exist_ok=True)
+    with open(os.path.join(temp_dir, 'test.txt'), 'w') as f:
+        f.write('This is a test file.')
+
+    # Define a BashOperator task with a working directory
+    list_files = BashOperator(
+        task_id='list_files',
+        bash_command='ls -l',
+        cwd=temp_dir
+    )
+```
+
+In this example, we create a temporary directory and a dummy file inside it. The BashOperator task then lists the files in that directory using the ls -l command. The cwd parameter is set to the temporary directory, ensuring that the command is executed in the correct context.
+
+**Capturing Output with XCom**
+
+The xcom_push parameter allows you to capture the standard output of the bash command and push it to XCom. This allows downstream tasks to access the output.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='bash_operator_xcom_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define a BashOperator task that pushes output to XCom
+    get_date = BashOperator(
+        task_id='get_date',
+        bash_command='date +%Y-%m-%d',
+        xcom_push=True
+    )
+
+    # Define a PythonOperator task that retrieves the output from XCom
+    def print_date_fn(**kwargs):
+        ti = kwargs['ti']
+        date_from_xcom = ti.xcom_pull(task_ids='get_date')
+        print(f"The date from XCom is: {date_from_xcom}")
+
+    print_date = PythonOperator(
+        task_id='print_date',
+        python_callable=print_date_fn,
+        provide_context=True,
+    )
+
+    get_date >> print_date
+```
+
+In this example, the get_date task executes the date +%Y-%m-%d command and pushes the output to XCom. The print_date task then retrieves the output from XCom using the xcom_pull method and prints it. We will cover PythonOperator in the next module.
+
 #### <a name="chapter2part3.2"></a>Chapter 2 - Part 3.2: Practical Examples and Demonstrations
+
+Let's explore some practical examples of using the BashOperator in real-world scenarios.
+
+**Example 1: Data Processing**
+
+Suppose you have a script that processes data from a file. You can use the BashOperator to execute this script as part of your Airflow DAG.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='data_processing_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define a BashOperator task to execute a data processing script
+    process_data = BashOperator(
+        task_id='process_data',
+        bash_command='/path/to/your/data_processing_script.sh'
+    )
+```
+
+In this example, the process_data task executes the data_processing_script.sh script. You can pass environment variables to the script using the env parameter if needed.
+
+**Example 2: File Manipulation**
+
+You can use the BashOperator to perform file manipulation tasks, such as copying, moving, or deleting files.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='file_manipulation_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define a BashOperator task to copy a file
+    copy_file = BashOperator(
+        task_id='copy_file',
+        bash_command='cp /path/to/source/file.txt /path/to/destination/file.txt'
+    )
+```
+
+In this example, the copy_file task copies a file from one location to another.
+
+**Example 3: System Administration**
+
+You can use the BashOperator to perform system administration tasks, such as restarting a service or checking the status of a system.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='system_administration_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define a BashOperator task to restart a service
+    restart_service = BashOperator(
+        task_id='restart_service',
+        bash_command='sudo systemctl restart my_service'
+    )
+```
+
+In this example, the restart_service task restarts a service using the systemctl command. Note that you may need to configure sudo access for the Airflow user to execute this command.
 
 #### <a name="chapter2part3.3"></a>Chapter 2 - Part 3.3: Best Practices
 
+- **Keep commands simple**: For complex logic, prefer calling an external script rather than embedding it directly in the bash_command. This improves readability and maintainability.
+- **Use environment variables**: Avoid hardcoding sensitive information in the bash_command. Use environment variables to pass configuration values and secrets.
+- **Handle errors**: Ensure that your bash commands handle errors gracefully. Use error codes and conditional logic to prevent the DAG from failing unexpectedly.
+- **Consider security**: Be mindful of the security implications of executing bash commands. Avoid running commands with elevated privileges unless absolutely necessary.
+- **Use full paths**: When referencing files or executables, use full paths to avoid ambiguity and ensure that the command is executed in the correct context.
+
 #### <a name="chapter2part4"></a>Chapter 2 - Part 4: Defining DAG Schedules and Catchup
+
+In this lesson, we'll delve into the crucial aspects of scheduling your Directed Acyclic Graphs (DAGs) in Apache Airflow and understanding the concept of "catchup." Proper scheduling ensures your workflows run automatically and consistently, while understanding catchup helps you manage backfilling and historical data processing. We'll explore how to define schedules using various methods and how to control the catchup behavior to suit your specific needs.
 
 #### <a name="chapter2part4.1"></a>Chapter 2 - Part 4.1: Understanding DAG Schedules
 
+A DAG schedule defines when and how often your DAG will run. Airflow provides several ways to define schedules, offering flexibility to accommodate various use cases. The schedule is a crucial part of the DAG definition, as it dictates the rhythm of your data pipelines.
+
+**Cron Expressions**
+
+Cron expressions are a widely used standard for defining schedules. They provide a concise and powerful way to specify complex recurring schedules. A cron expression consists of five or six fields representing:
+
+- Minute (0-59)
+- Hour (0-23)
+- Day of the month (1-31)
+- Month (1-12 or JAN-DEC)
+- Day of the week (0-6 or SUN-SAT)
+- (Optional) Year
+
+Here are some examples of cron expressions:
+
+- 0 0 * * *: Run the DAG every day at midnight.
+- 0 9 * * 1-5: Run the DAG every weekday (Monday to Friday) at 9:00 AM.
+- 0 12 1 * *: Run the DAG on the first day of every month at 12:00 PM.
+- 0 18 * * 0: Run the DAG every Sunday at 6:00 PM.
+- 0 0 1,15 * *: Run the DAG on the 1st and 15th of every month at midnight.
+
+**Example:**
+
+Let's say you want to run a DAG that updates your sales report every day at 7:00 AM. You would use the following cron expression:
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='sales_report_daily',
+    schedule_interval='0 7 * * *',  # Run at 7:00 AM every day
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags=['sales'],
+) as dag:
+    update_report = BashOperator(
+        task_id='update_sales_report',
+        bash_command='echo "Updating sales report..."',
+    )
+```
+
+In this example, schedule_interval='0 7 * * *' defines the schedule. The start_date specifies when the DAG should start running, and catchup=False (explained later) prevents backfilling missed runs.
+
+**Timedelta Objects**
+
+Instead of cron expressions, you can use datetime.timedelta objects to define schedules based on fixed time intervals. This is useful for running DAGs at regular intervals, such as every hour, every 30 minutes, or every week.
+
+**Example:**
+
+To run a DAG every hour, you can use timedelta(hours=1):
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime, timedelta
+
+with DAG(
+    dag_id='hourly_data_processing',
+    schedule_interval=timedelta(hours=1),  # Run every hour
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags=['data_processing'],
+) as dag:
+    process_data = BashOperator(
+        task_id='process_hourly_data',
+        bash_command='echo "Processing hourly data..."',
+    )
+```
+
+Here, schedule_interval=timedelta(hours=1) sets the DAG to run every hour.
+
+**Preset Schedules**
+
+Airflow provides several preset schedules for common use cases, making it easier to define simple schedules without writing cron expressions or timedelta objects. Some of the most common preset schedules include:
+
+- @once: Run the DAG only once.
+- @hourly: Run the DAG every hour.
+- @daily: Run the DAG every day.
+- @weekly: Run the DAG every week.
+- @monthly: Run the DAG every month.
+- @yearly: Run the DAG every year.
+
+**Example:**
+
+To run a DAG daily, you can simply use @daily:
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='daily_backup',
+    schedule_interval='@daily',  # Run every day
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags=['backup'],
+) as dag:
+    backup_database = BashOperator(
+        task_id='backup_db',
+        bash_command='echo "Backing up database..."',
+    )
+```
+
+Using @daily is more readable and less error-prone than writing the equivalent cron expression (0 0 * * *).
+
+**None or [] for Manual Triggers**
+
+If you want to trigger your DAG manually without any automated schedule, you can set schedule_interval to None or []. This is useful for DAGs that are triggered by external events or on-demand.
+
+Example:
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='on_demand_report',
+    schedule_interval=None,  # Run only when triggered manually
+    start_date=datetime(2023, 1, 1),
+    catchup=False,
+    tags=['report'],
+) as dag:
+    generate_report = BashOperator(
+        task_id='generate_report',
+        bash_command='echo "Generating report..."',
+    )
+```
+
+With schedule_interval=None, the DAG will only run when you manually trigger it from the Airflow UI or using the Airflow CLI.
+
 #### <a name="chapter2part4.2"></a>Chapter 2 - Part 4.2: Understanding Catchup
+
+The catchup parameter in a DAG definition controls whether Airflow should run the DAG for all missed intervals between the start_date and the current date. By default, catchup is set to True, meaning Airflow will attempt to "catch up" on all past runs.
+
+**Catchup Enabled (catchup=True)**
+
+When catchup is enabled, Airflow will schedule DAG runs for all intervals that have not been executed since the start_date. This is useful for backfilling data or processing historical data that was not processed when the DAG was initially deployed.
+
+**Example:**
+
+Suppose you have a DAG with start_date=datetime(2023, 1, 1) and schedule_interval='@daily'. If you deploy this DAG on January 10, 2023, with catchup=True, Airflow will schedule runs for January 1st, 2nd, 3rd, ..., 9th, and 10th.
+
+**Catchup Disabled (catchup=False)**
+
+When catchup is disabled, Airflow will only schedule runs for the current and future intervals, ignoring any missed intervals between the start_date and the current date. This is useful when you only want to process new data and don't need to backfill historical data.
+
+**Example:**
+
+Using the same DAG as above, if you deploy it on January 10, 2023, with catchup=False, Airflow will only schedule a run for January 10th and subsequent days, skipping the runs for January 1st to 9th.
+
+**Implications of Catchup**
+
+- **Resource Consumption**: Enabling catchup can consume significant resources, especially for DAGs with frequent schedules or long historical periods. Be mindful of the potential impact on your Airflow infrastructure.
+- **Data Consistency**: Catchup ensures that all historical data is processed, maintaining data consistency and completeness.
+- **DAG Behavior**: Disabling catchup can simplify DAG execution and reduce resource consumption, but it may result in incomplete historical data.
+
+**Controlling Catchup Behavior**
+
+You can control the catchup behavior at the DAG level using the catchup parameter. However, you can also control it at the task level using the depends_on_past parameter in the operator definition.
+
+- **depends_on_past=True**: The task will only run if the previous task instance has succeeded. This is useful for ensuring data dependencies are met when backfilling data.
+- **depends_on_past=False**: The task will run regardless of the status of the previous task instance.
+
+**Example:**
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='data_backfill',
+    schedule_interval='@daily',
+    start_date=datetime(2023, 1, 1),
+    catchup=True,
+    tags=['data_processing'],
+) as dag:
+    extract_data = BashOperator(
+        task_id='extract_data',
+        bash_command='echo "Extracting data..."',
+        depends_on_past=False,  # Extract data regardless of previous runs
+    )
+
+    transform_data = BashOperator(
+        task_id='transform_data',
+        bash_command='echo "Transforming data..."',
+        depends_on_past=True,  # Transform data only if previous extraction succeeded
+    )
+
+    load_data = BashOperator(
+        task_id='load_data',
+        bash_command='echo "Loading data..."',
+        depends_on_past=True,  # Load data only if previous transformation succeeded
+    )
+
+    extract_data >> transform_data >> load_data
+```
+
+In this example, the extract_data task will run for all missed intervals, regardless of whether previous runs have succeeded. However, the transform_data and load_data tasks will only run if the previous task instance has succeeded, ensuring data dependencies are met during backfilling.
 
 #### <a name="chapter2part4.3"></a>Chapter 2 - Part 4.3: Practical Examples and Demonstrations
 
+Let's consider a few practical examples to illustrate the concepts of DAG schedules and catchup.
+
+**Example 1: Daily Data Aggregation**
+.
+Suppose you have a DAG that aggregates daily sales data and generates a report. You want this DAG to run every day at 8:00 AM. You also want to backfill data for the past week in case the DAG was not running.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='daily_sales_aggregation',
+    schedule_interval='0 8 * * *',  # Run at 8:00 AM every day
+    start_date=datetime(2023, 1, 1),
+    catchup=True,  # Backfill data for missed intervals
+    tags=['sales', 'aggregation'],
+) as dag:
+    aggregate_sales = BashOperator(
+        task_id='aggregate_sales',
+        bash_command='echo "Aggregating daily sales data..."',
+    )
+
+    generate_report = BashOperator(
+        task_id='generate_report',
+        bash_command='echo "Generating sales report..."',
+    )
+
+    aggregate_sales >> generate_report
+```
+
+In this example, catchup=True ensures that the DAG will backfill data for any missed days since the start_date.
+
+**Example 2: Weekly Data Backup**
+
+Suppose you have a DAG that backs up your database every Sunday at midnight. You don't need to backfill data for missed weeks, as the latest backup is sufficient.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='weekly_database_backup',
+    schedule_interval='0 0 * * 0',  # Run every Sunday at midnight
+    start_date=datetime(2023, 1, 1),
+    catchup=False,  # Do not backfill data for missed weeks
+    tags=['backup', 'database'],
+) as dag:
+    backup_database = BashOperator(
+        task_id='backup_db',
+        bash_command='echo "Backing up database..."',
+    )
+```
+
+Here, catchup=False prevents the DAG from backfilling data for missed weeks, ensuring that only the latest backup is performed.
+
+**Example 3: Event-Triggered Data Processing**
+
+Suppose you have a DAG that processes data when a new file arrives in a specific directory. This DAG should only run when a new file is detected and should not have a fixed schedule.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='event_triggered_data_processing',
+    schedule_interval=None,  # Run only when triggered manually
+    start_date=datetime(2023, 1, 1),
+    catchup=False,  # Not applicable for manual triggers
+    tags=['data_processing', 'event_driven'],
+) as dag:
+    process_data = BashOperator(
+        task_id='process_data',
+        bash_command='echo "Processing data from new file..."',
+    )
+```
+
+In this case, schedule_interval=None indicates that the DAG is triggered manually, and catchup=False is not relevant as there is no fixed schedule.
+
 #### <a name="chapter2part5"></a>Chapter 2 - Part 5: Running and Monitoring Your DAG in the Airflow UI
+
+After defining your DAG, setting up task dependencies, and configuring a schedule, the next crucial step is to run and monitor it. The Airflow UI provides a comprehensive interface for interacting with your DAGs, triggering runs, and observing their execution. This lesson will guide you through the various features of the Airflow UI that are essential for managing your workflows.
 
 #### <a name="chapter2part5.1"></a>Chapter 2 - Part 5.1: Accessing the Airflow UI
 
+The Airflow UI is typically accessed through a web browser. If you followed the setup instructions in Module 1, you should have a local Airflow instance running. By default, the UI is accessible at http://localhost:8080. Open this address in your browser to access the Airflow UI. You'll likely be prompted for login credentials. The default username and password (if you haven't changed them) are usually airflow and airflow.
+
 #### <a name="chapter2part5.2"></a>Chapter 2 - Part 5.2: Understanding the DAGs View
+
+Upon logging in, you'll be presented with the DAGs view. This is the central hub for managing your DAGs.
+
+**DAG List**
+
+The DAGs view displays a list of all DAGs that Airflow has discovered in your dags_folder (configured in your airflow.cfg file or environment variables). For each DAG, you'll see key information:
+
+- **DAG ID**: The unique identifier for the DAG.
+- **Owner**: The owner of the DAG (defined in the DAG definition).
+- **Schedule**: The schedule interval defined for the DAG.
+- **Last Run**: The date and time of the most recent DAG run.
+- **Next Run**: The scheduled date and time for the next DAG run.
+- **Recent Tasks**: A visual representation of the status of recent task instances.
+- **Links**: A set of icons providing quick access to various DAG-related actions and views.
+
+**DAG Actions**
+
+The DAGs view provides several actions you can perform on a DAG:
+
+- **Trigger DAG**: Manually trigger a new DAG run. This is useful for testing or running a DAG on demand.
+- **Pause/Unpause DAG**: Enable or disable the DAG's scheduler. Paused DAGs will not be scheduled to run automatically.
+- **Delete DAG**: Remove the DAG from Airflow. Use this with caution, as it will delete the DAG definition and its run history.
+- **Refresh**: Reload the DAGs to reflect any changes in the DAG definitions.
 
 #### <a name="chapter2part5.3"></a>Chapter 2 - Part 5.3: Exploring the DAG Details View
 
+Clicking on a DAG ID in the DAGs view will take you to the DAG Details view. This view provides a more in-depth look at the DAG's structure, status, and history.
+
+**Graph View**
+
+The Graph View is a visual representation of the DAG's tasks and dependencies. Each task is represented as a node, and dependencies are represented as arrows connecting the nodes. The color of each node indicates the task's current status:
+
+- **Green**: Success
+- **Red**: Failed
+- **Yellow**: Running
+- **Light Blue**: Upstream Failed (a task that was skipped because one of its upstream dependencies failed)
+- **White**: Scheduled/Queued
+- **Gray**: Not yet run
+
+You can hover over a task node to see more information about the task, such as its task ID, start time, and end time. You can also click on a task node to access the Task Instance Details.
+
+**Grid View**
+
+The Grid View provides a tabular representation of the DAG's past and future runs. Each row represents a DAG run, and each column represents a task. The cells in the grid show the status of each task instance for each DAG run. This view is useful for quickly identifying patterns of success and failure across multiple DAG runs.
+
+**Tree View**
+
+The Tree View presents a hierarchical view of the DAG runs and their task instances. It's similar to the Grid View but organized in a tree structure, making it easier to navigate complex DAGs with many tasks and dependencies.
+
+**Code View**
+
+The Code View displays the Python code that defines the DAG. This is useful for quickly reviewing the DAG's logic and configuration.
+
+**Task Instance Details**
+
+Clicking on a task in the Graph, Grid, or Tree View will take you to the Task Instance Details page. This page provides detailed information about a specific task instance, including:
+
+- **Log**: The task's execution logs, which can be invaluable for debugging.
+- **Task Attributes**: The task's configuration parameters.
+- **Try Number**: The number of times the task has been attempted (including retries).
+- **Start Time**: The time the task instance started running.
+- **End Time**: The time the task instance finished running.
+- **Duration**: The total time the task instance took to run.
+- **Mark Success/Fail**: Manually mark the task as successful or failed. Use this with caution, as it can affect the DAG's execution flow.
+- **Clear**: Clear the task instance's state, allowing it to be re-run. This is useful for recovering from errors or re-processing data.
+
 #### <a name="chapter2part5.4"></a>Chapter 2 - Part 5.4: Triggering DAG Runs
+
+You can trigger DAG runs manually from the Airflow UI in several ways:
+
+- **From the DAGs View**: Click the "Trigger DAG" button next to the DAG you want to run.
+- **From the DAG Details View**: Click the "Trigger DAG" button in the top right corner of the screen.
+
+When you trigger a DAG run, Airflow will create a new DAG run instance and schedule the tasks according to their dependencies.
 
 #### <a name="chapter2part5.5"></a>Chapter 2 - Part 5.5: Monitoring DAG Runs
 
+The Airflow UI provides several ways to monitor the progress of DAG runs:
+
+- **Graph View**: The Graph View provides a real-time visual representation of the DAG's execution. You can see which tasks are running, which have succeeded, and which have failed.
+- **Grid View**: The Grid View provides a tabular overview of the DAG's past and future runs. You can quickly see the status of each task instance for each DAG run.
+- **Task Instance Details**: The Task Instance Details page provides detailed information about a specific task instance, including its logs, attributes, and execution time.
+
 #### <a name="chapter2part5.6"></a>Chapter 2 - Part 5.6: Common Use Cases for the Airflow UI
 
-#### <a name="chapter2part5.7"></a>Chapter 2 - Part 5.7: Practical Examples
+Here are some common scenarios where the Airflow UI is essential:
 
-#### <a name="chapter2part5.8"></a>Chapter 2 - Part 5.8: Real-World Application
+- **Debugging Failed Tasks**: When a task fails, the Airflow UI provides access to the task's logs, which can help you identify the cause of the failure.
+- **Monitoring DAG Performance**: The Airflow UI provides information about task execution times, which can help you identify performance bottlenecks in your DAG.
+- **Manually Triggering DAG Runs**: You can use the Airflow UI to manually trigger DAG runs for testing or on-demand processing.
+- **Clearing Task Instances**: If a task fails due to a transient error, you can use the Airflow UI to clear the task instance and re-run it.
+- **Pausing and Unpausing DAGs**: You can use the Airflow UI to pause DAGs that you don't want to run automatically, or to unpause DAGs that have been paused.
 
 ## <a name="chapter3"></a>Chapter 3: Core Airflow Operator
 
