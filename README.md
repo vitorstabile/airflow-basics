@@ -6166,45 +6166,1175 @@ In this example, the custom_alert function is executed after my_task. The functi
 
 #### <a name="chapter6part1"></a>Chapter 6 - Part 1: Introduction to Airflow Sensors
 
+Airflow sensors are a crucial component for building robust and reliable data pipelines. They allow your DAGs to react to external events, ensuring that tasks only execute when their required conditions are met. This lesson will introduce you to the fundamental concepts of sensors, their role in workflow orchestration, and how they contribute to building more resilient and automated data workflows. We'll explore the core principles behind sensors, their different types, and how they integrate into the broader Airflow ecosystem.
+
 #### <a name="chapter6part1.1"></a>Chapter 6 - Part 1.1: Understanding Airflow Sensors
+
+At their core, Airflow sensors are a special type of operator that waits for a specific condition to be true before allowing downstream tasks to proceed. Unlike regular operators that perform actions, sensors primarily monitor the state of external systems or data sources. They act as gatekeepers, ensuring that dependencies are satisfied before triggering subsequent tasks.
+
+Think of a sensor as a watchful observer. It continuously checks for a particular event or condition. Once that condition is met, the sensor signals success, and the DAG proceeds to the next task. If the condition isn't met within a specified timeframe, the sensor can either retry or fail, depending on its configuration.
+
+**Key Characteristics of Sensors**
+
+- **Pokes**: Sensors operate by repeatedly "poking" an external system or data source. A "poke" is essentially a check to see if the desired condition is met.
+- **Timeout**: Sensors have a timeout period. If the condition isn't met within this period, the sensor will either fail or retry, preventing the DAG from hanging indefinitely.
+- **Retry Mechanism**: Sensors often have built-in retry mechanisms. If a poke fails, the sensor can retry after a specified interval, up to a maximum number of retries.
+- **Asynchronous Operation**: While sensors themselves run within the Airflow scheduler, they often interact with external systems asynchronously. This means the sensor doesn't block the scheduler while waiting for the condition to be met.
+- **Idempotency**: Like other Airflow operators, sensors should ideally be idempotent. This means that running the sensor multiple times with the same configuration should have the same effect as running it once.
+
+**Why Use Sensors?**
+
+Sensors address a fundamental challenge in data engineering: ensuring that data pipelines are triggered only when their dependencies are met. Without sensors, you might have to rely on fixed schedules or external triggers, which can lead to inefficiencies and errors.
+
+Here's why sensors are essential:
+
+- **Dependency Management**: Sensors provide a robust mechanism for managing dependencies between tasks and external systems.
+- **Data Availability**: They ensure that data is available before a task attempts to process it, preventing errors and data inconsistencies.
+- **Event-Driven Workflows**: Sensors enable you to build event-driven workflows that react to real-time events, such as file arrivals or API updates.
+- **Resource Optimization**: By waiting for specific conditions to be met, sensors prevent tasks from running unnecessarily, saving valuable resources.
+- **Increased Reliability**: Sensors make your DAGs more resilient to failures by ensuring that tasks only execute when their prerequisites are satisfied.
+
+**Sensor States**
+
+Like other Airflow tasks, sensors can be in various states:
+
+- **Success**: The sensor's condition has been met, and it has successfully completed its task.
+- **Failed**: The sensor's condition has not been met within the specified timeout period, and it has failed.
+- **Running**: The sensor is currently poking the external system and waiting for the condition to be met.
+- **Upstream Failed**: A task upstream of the sensor has failed, preventing the sensor from running.
+- **Skipped**: The sensor has been skipped due to branching or other conditional logic.
 
 #### <a name="chapter6part1.2"></a>Chapter 6 - Part 1.2: Types of Airflow Sensors
 
+Airflow provides a variety of built-in sensors for common use cases. These sensors can be broadly categorized based on the type of external system they monitor.
+
+**File Sensors**
+
+File sensors monitor the existence or state of files in a file system.
+
+- **FileSensor**: The most basic file sensor, it waits for a file to exist at a specified path.
+- **ExternalTaskSensor**: While not strictly a file sensor, it can be used to monitor the completion of a task in another DAG, which might indirectly indicate file availability.
+
+**Data Sensors**
+
+Data sensors monitor the state of data in databases or data warehouses.
+
+- **SqlSensor**: Executes a SQL query and waits for it to return a specific result.
+- **S3KeySensor**: Waits for a key (file) to exist in an Amazon S3 bucket.
+- **AzureBlobStoragePrefixSensor**: Waits for a blob with a specified prefix to exist in Azure Blob Storage.
+- **GCSObjectExistenceSensor**: Waits for an object to exist in Google Cloud Storage.
+
+**API Sensors**
+
+API sensors monitor the availability or state of APIs.
+
+- **HttpSensor**: Sends an HTTP request to an API endpoint and waits for a specific response.
+
+**Time Sensors**
+
+Time sensors wait for a specific time or duration to pass.
+
+- **TimeDeltaSensor**: Waits for a specified time delta (duration) to pass.
+- **TimeSensor**: Waits for a specific time of day to arrive.
+
+**Other Sensors**
+
+- **ExternalTaskSensor**: Waits for a task in another DAG to complete successfully. This is useful for cross-DAG dependencies.
+- **PythonSensor**: Executes a Python callable and waits for it to return True. This provides maximum flexibility for defining custom sensor logic.
+
 #### <a name="chapter6part1.3"></a>Chapter 6 - Part 1.3: Sensor Parameters
+
+All sensors share some common parameters that control their behavior:
+
+- **task_id (required)**: A unique identifier for the sensor task within the DAG.
+- **poke_interval (default: 60 seconds)**: The interval, in seconds, between pokes. This determines how frequently the sensor checks for the condition.
+- **timeout (default: 7 * 24 * 60 * 60 seconds - 7 days)**: The maximum time, in seconds, that the sensor will wait for the condition to be met. After this time, the sensor will fail.
+- **retries (default: depends on DAG configuration)**: The number of times the sensor will retry if a poke fails.
+- **retry_delay (default: depends on DAG configuration)**: The delay, in seconds, between retries.
+- **mode (default: 'poke')**: Determines how the sensor operates. The default 'poke' mode repeatedly pokes the external system. Other modes, like 'reschedule', can be used to free up the worker slot while waiting.
 
 #### <a name="chapter6part1.4"></a>Chapter 6 - Part 1.4: Practical Examples
 
+Let's illustrate the use of sensors with some practical examples.
+
+**Example 1: Waiting for a File to Arrive**
+
+Suppose you have a DAG that processes data from a file that is generated daily by an external system. You can use a FileSensor to wait for the file to arrive before starting the processing tasks.
+
+```py
+from airflow import DAG
+from airflow.sensors.filesystem import FileSensor
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='file_processing_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+    # Define the path to the file
+    file_path = '/path/to/your/data/file.txt'
+
+    # Create a FileSensor to wait for the file to arrive
+    wait_for_file = FileSensor(
+        task_id='wait_for_file',
+        filepath=file_path,
+        poke_interval=60,  # Check every 60 seconds
+        timeout=60 * 60 * 24,  # Timeout after 24 hours
+    )
+
+    # Define a task to process the file
+    process_file = BashOperator(
+        task_id='process_file',
+        bash_command='cat ' + file_path + ' | wc -l > /path/to/your/data/file_count.txt',
+    )
+
+    # Define the task dependency
+    wait_for_file >> process_file
+```
+
+In this example, the wait_for_file task will repeatedly check for the existence of the file at /path/to/your/data/file.txt. Once the file exists, the sensor will succeed, and the process_file task will be triggered. The process_file task simply counts the number of lines in the file and writes the result to another file.
+
+**Example 2: Checking for API Availability**
+
+Let's say you have a DAG that relies on an external API. You can use an HttpSensor to check if the API is available before proceeding with the tasks that use it.
+
+```py
+from airflow import DAG
+from airflow.sensors.http import HttpSensor
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='api_dependency_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+    # Define the API endpoint
+    api_endpoint = 'https://api.example.com/status'
+
+    # Create an HttpSensor to check API availability
+    check_api_availability = HttpSensor(
+        task_id='check_api_availability',
+        http_conn_id='http_default',  # Use the 'http_default' connection
+        endpoint='/status',
+        request_params={},
+        response_check=lambda response: response.status_code == 200,
+        poke_interval=60,  # Check every 60 seconds
+        timeout=60 * 60,  # Timeout after 1 hour
+    )
+
+    # Define a task that uses the API
+    use_api = BashOperator(
+        task_id='use_api',
+        bash_command='curl https://api.example.com/data > /path/to/your/data/api_data.json',
+    )
+
+    # Define the task dependency
+    check_api_availability >> use_api
+```
+
+In this example, the check_api_availability task will send an HTTP request to https://api.example.com/status every 60 seconds. The response_check parameter specifies a function that checks if the response status code is 200 (OK). If the API is available and returns a 200 status code, the sensor will succeed, and the use_api task will be triggered. The use_api task retrieves data from the API and saves it to a file.
+
+**Note**: You'll need to configure an Airflow connection with the ID http_default to use the HttpSensor. This connection should specify the base URL of the API (e.g., https://api.example.com). Refer to Module 4 for details on Airflow Connections.
+
+**Example 3: Waiting for a Database Query to Return a Result**
+
+Imagine you have a DAG that processes data after a specific record is inserted into a database. You can use a SqlSensor to wait for the record to appear before proceeding.
+
+```py
+from airflow import DAG
+from airflow.providers.postgres.sensors.postgres import PostgresSensor
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='database_dependency_dag',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily',
+    catchup=False
+) as dag:
+    # Define the SQL query
+    sql_query = "SELECT COUNT(*) FROM your_table WHERE processed = FALSE;"
+
+    # Create a SqlSensor to check for the record
+    check_database = PostgresSensor(
+        task_id='check_database',
+        postgres_conn_id='postgres_default',  # Use the 'postgres_default' connection
+        sql=sql_query,
+        success=lambda result: result[0][0] > 0, # Check if the count is greater than 0
+        poke_interval=60,  # Check every 60 seconds
+        timeout=60 * 60,  # Timeout after 1 hour
+    )
+
+    # Define a task that processes the data
+    process_data = BashOperator(
+        task_id='process_data',
+        bash_command='echo "Processing data from database"',
+    )
+
+    # Define the task dependency
+    check_database >> process_data
+```
+
+In this example, the check_database task will execute the SQL query SELECT COUNT(*) FROM your_table WHERE processed = FALSE; every 60 seconds. The success parameter specifies a lambda function that checks if the query returns a count greater than 0. If the query returns a count greater than 0 (meaning there are unprocessed records), the sensor will succeed, and the process_data task will be triggered.
+
+**Note**: You'll need to configure an Airflow connection with the ID postgres_default to use the PostgresSensor. This connection should specify the connection details for your PostgreSQL database. Refer to Module 4 for details on Airflow Connections.
+
 #### <a name="chapter6part1.5"></a>Chapter 6 - Part 1.5: Best Practices for Using Sensors
+
+- **Use Sensors Sparingly**: Sensors consume worker resources while they are poking. Avoid using too many sensors in a single DAG, as this can put a strain on your Airflow infrastructure. Consider alternative approaches, such as using external triggers or scheduling DAGs based on events.
+- **Set Appropriate Timeouts**: Always set appropriate timeouts for your sensors. This prevents DAGs from hanging indefinitely if the expected condition never occurs.
+- **Optimize Poke Intervals**: Choose a poke interval that is appropriate for the frequency of the event you are monitoring. A shorter poke interval will result in more frequent checks, but it will also consume more resources. A longer poke interval will reduce resource consumption, but it may also delay the execution of your DAG.
+- **Use the reschedule Mode**: For sensors that may need to wait for a long time, consider using the reschedule mode. This mode frees up the worker slot while the sensor is waiting, allowing other tasks to run. However, be aware that the reschedule mode can introduce some overhead, as the sensor needs to be re-scheduled each time it pokes.
+- **Consider Idempotency**: Ensure that your sensors are idempotent. This means that running the sensor multiple times with the same configuration should have the same effect as running it once. This is especially important for sensors that interact with external systems that may have side effects.
+- **Handle Sensor Failures**: Implement proper error handling for sensor failures. This may involve retrying the sensor, sending an alert, or failing the DAG.
+- **Use Connection Pooling**: When using sensors that interact with databases or APIs, use connection pooling to improve performance and reduce resource consumption. Airflow connections provide built-in support for connection pooling.
+- **Monitor Sensor Performance**: Monitor the performance of your sensors to identify any bottlenecks or issues. This may involve tracking the execution time of sensors, the number of pokes, and the number of failures.
 
 #### <a name="chapter6part2"></a>Chapter 6 - Part 2: Using FileSensor to wait for file arrival
 
+Airflow sensors are a crucial part of building robust and reliable data pipelines. They allow your DAGs to react to external triggers, ensuring that tasks only execute when their required conditions are met. The FileSensor is one of the most fundamental and frequently used sensors. It monitors the existence of a file (or files) in a specified location before allowing downstream tasks to proceed. This lesson will provide a comprehensive understanding of how to use the FileSensor effectively in your Airflow DAGs.
+
 #### <a name="chapter6part2.1"></a>Chapter 6 - Part 2.1: Understanding the FileSensor
+
+The FileSensor is an Airflow sensor that waits for a file or a set of files to be present in a specific location. It's a subclass of BaseSensorOperator and is designed to pause the execution of a DAG until the specified file(s) are found. This is particularly useful in scenarios where your DAG depends on data being generated by an external system or process.
+
+**Key Parameters of FileSensor**
+
+To effectively use the FileSensor, it's essential to understand its key parameters:
+
+- **filepath (str)**: This is the most important parameter. It specifies the path to the file or directory that the sensor will monitor. This can be an absolute path or a relative path. If a directory is specified, the sensor will wait for at least one file to appear in that directory.
+- **fs_conn_id (str, optional)**: This parameter specifies the connection ID of the filesystem to use. If not provided, the sensor will use the local filesystem. You'll need to configure a connection in Airflow's UI if you're accessing a remote filesystem like S3, HDFS, or Google Cloud Storage.
+- **poke_interval (int, optional)**: This parameter defines how often (in seconds) the sensor will check for the existence of the file. The default value is 60 seconds.
+- **timeout (int, optional)**: This parameter specifies the maximum amount of time (in seconds) that the sensor will wait for the file to appear. If the file is not found within the timeout period, the sensor will fail, and the task will be marked as failed. The default value is 7 * 24 * 60 * 60 (7 days).
+- **soft_fail (bool, optional)**: If set to True, the task will be marked as skipped instead of failed when the timeout is reached. This is useful in scenarios where the absence of the file is not necessarily an error condition. The default value is False.
+- **mode (str, optional)**: Defines the behavior of the sensor when the criteria are met. It can be set to 'poke' (default), 'reschedule', or 'instant'.
+  - **'poke'**: The sensor sleeps for poke_interval seconds between checks.
+  - **'reschedule'**: The sensor defers the task to the scheduler, freeing up the worker slot. The task will be rescheduled after poke_interval seconds. This is useful for long-running sensors to avoid tying up worker resources.
+  - **'instant'**: The sensor returns immediately without waiting. This is useful for testing or when you want the sensor to check only once.
+ 
+**Example: Monitoring a Local File**
+
+Let's start with a simple example of using FileSensor to monitor a local file. Assume you have a process that generates a file named data.txt in the /tmp/data directory. You want your Airflow DAG to start processing this file only after it has been created.
+
+```py
+from airflow import DAG
+from airflow.providers.apache.commons.io.sensors.file import FileSensor
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='file_sensor_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define the FileSensor task
+    wait_for_file = FileSensor(
+        task_id='wait_for_data_file',
+        filepath='/tmp/data/data.txt',
+        poke_interval=10,  # Check every 10 seconds
+        timeout=60,       # Timeout after 60 seconds
+        soft_fail=True     # Mark as skipped if timeout is reached
+    )
+
+    # Define a task to process the file (e.g., using BashOperator)
+    process_file = BashOperator(
+        task_id='process_data_file',
+        bash_command='echo "Processing data.txt" && cat /tmp/data/data.txt'
+    )
+
+    # Define task dependency
+    wait_for_file >> process_file
+```
+
+In this example:
+
+- wait_for_file is a FileSensor task that monitors the file /tmp/data/data.txt.
+- poke_interval is set to 10 seconds, meaning the sensor will check for the file every 10 seconds.
+- timeout is set to 60 seconds. If the file is not found within 60 seconds, the sensor will timeout.
+- soft_fail is set to True. If the sensor times out, the task will be marked as skipped instead of failed.
+- process_file is a BashOperator task that simulates processing the data file. It will only run after the FileSensor finds the file.
+- wait_for_file >> process_file defines the task dependency, ensuring that process_file only runs after wait_for_file succeeds (or is skipped due to soft_fail).
+
+**Monitoring Files on Remote Filesystems**
+
+The FileSensor can also be used to monitor files on remote filesystems like S3, HDFS, or Google Cloud Storage. To do this, you need to configure an Airflow connection for the specific filesystem and specify the fs_conn_id parameter in the FileSensor.
+
+**Example: Monitoring a File on S3**
+
+Assume you have an S3 bucket named my-s3-bucket and you want to wait for a file named data.csv to appear in the data/ prefix.
+
+First, you need to create an S3 connection in the Airflow UI. Go to Admin -> Connections and create a new connection with the following details:
+
+- **Conn Id**: s3_connection (or any name you prefer)
+- **Conn Type**: Amazon S3
+- **Extra**: (Fill in your AWS Access Key ID and Secret Access Key in JSON format, or use IAM roles if running on AWS)
+
+```json
+{
+    "aws_access_key_id": "YOUR_ACCESS_KEY",
+    "aws_secret_access_key": "YOUR_SECRET_KEY",
+    "region_name": "us-east-1" # Replace with your AWS region
+}
+```
+
+Then, you can use the FileSensor to monitor the file on S3:
+
+```py
+from airflow import DAG
+from airflow.providers.apache.commons.io.sensors.file import FileSensor
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='s3_file_sensor_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define the FileSensor task
+    wait_for_s3_file = FileSensor(
+        task_id='wait_for_s3_file',
+        filepath='s3://my-s3-bucket/data/data.csv',
+        fs_conn_id='s3_connection',  # Specify the S3 connection ID
+        poke_interval=10,
+        timeout=60
+    )
+
+    # Define a task to process the file (e.g., using BashOperator)
+    process_file = BashOperator(
+        task_id='process_s3_file',
+        bash_command='echo "Processing data.csv from S3"'
+    )
+
+    # Define task dependency
+    wait_for_s3_file >> process_file
+```
+
+In this example:
+
+- filepath is set to s3://my-s3-bucket/data/data.csv, which specifies the S3 path to monitor.
+- fs_conn_id is set to s3_connection, which refers to the S3 connection you configured in the Airflow UI.
+
+**Monitoring for the Existence of Any File in a Directory**
+
+The FileSensor can also be configured to wait for the existence of any file within a specified directory. In this case, the filepath parameter should point to the directory. The sensor will succeed as soon as at least one file is found in the directory.
+
+```py
+from airflow import DAG
+from airflow.providers.apache.commons.io.sensors.file import FileSensor
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='file_sensor_directory_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define the FileSensor task
+    wait_for_file_in_directory = FileSensor(
+        task_id='wait_for_file_in_directory',
+        filepath='/tmp/data',  # Specify the directory to monitor
+        poke_interval=10,
+        timeout=60
+    )
+
+    # Define a task to process the files in the directory
+    process_files = BashOperator(
+        task_id='process_files_in_directory',
+        bash_command='echo "Processing files in /tmp/data" && ls -l /tmp/data'
+    )
+
+    # Define task dependency
+    wait_for_file_in_directory >> process_files
+```
+
+In this example, the FileSensor will wait for at least one file to be created in the /tmp/data directory.
+
+**Using mode='reschedule' for Long-Running Sensors**
+
+For long-running sensors, it's recommended to use mode='reschedule' to avoid tying up worker resources. When mode is set to 'reschedule', the sensor task will be deferred to the scheduler, freeing up the worker slot. The task will be rescheduled after the poke_interval.
+
+```py
+from airflow import DAG
+from airflow.providers.apache.commons.io.sensors.file import FileSensor
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+with DAG(
+    dag_id='file_sensor_reschedule_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define the FileSensor task
+    wait_for_file_reschedule = FileSensor(
+        task_id='wait_for_file_reschedule',
+        filepath='/tmp/data/data.txt',
+        poke_interval=60,
+        timeout=3600,
+        mode='reschedule'  # Use reschedule mode
+    )
+
+    # Define a task to process the file
+    process_file = BashOperator(
+        task_id='process_data_file',
+        bash_command='echo "Processing data.txt"'
+    )
+
+    # Define task dependency
+    wait_for_file_reschedule >> process_file
+```
+
+In this example, the FileSensor is configured to use mode='reschedule'. This means that the worker slot will be released while the sensor is waiting for the file, making it more efficient for long-running sensors.
+
+**Considerations and Best Practices**
+
+- **Error Handling**: Always consider the possibility that the file might never arrive. Set a reasonable timeout value to prevent the sensor from running indefinitely. Use soft_fail=True if the absence of the file is not necessarily an error condition.
+- **Performance**: Avoid setting the poke_interval too low, as this can put unnecessary load on the system. A reasonable value is typically between 10 seconds and 1 minute, depending on the frequency with which the file is expected to be created.
+- **Idempotency**: Ensure that your downstream tasks are idempotent, meaning they can be run multiple times without causing unintended side effects. This is important because the sensor might succeed and trigger the downstream tasks even if the file is only partially written. We discussed idempotency in Module 3.
+- **Security**: When accessing files on remote filesystems, ensure that your Airflow connections are properly configured with the necessary credentials and permissions.
+- **Alternatives**: Consider using event-driven architectures (e.g., using cloud provider's event services like AWS S3 Event Notifications or Google Cloud Storage Notifications) for more reactive and efficient data pipelines. These services can trigger your DAGs as soon as the file arrives, eliminating the need for polling with a sensor.
+
+The FileSensor is a versatile tool for building data pipelines that depend on external file events. By understanding its parameters and best practices, you can effectively use it to create robust and reliable workflows in Airflow.
 
 #### <a name="chapter6part3"></a>Chapter 6 - Part 3: Using HttpSensor to check for API availability
 
+The HttpSensor in Apache Airflow is a powerful tool for ensuring that your data pipelines only proceed when external APIs are available and returning the expected responses. It acts as a gatekeeper, preventing downstream tasks from failing due to API outages or unexpected behavior. This lesson will delve into the intricacies of using HttpSensor, covering its parameters, common use cases, and best practices for implementation.
+
 #### <a name="chapter6part3.1"></a>Chapter 6 - Part 3.1: Understanding the HttpSensor
+
+The HttpSensor is an Airflow sensor that makes an HTTP request to a specified endpoint and checks the response against certain criteria. It repeatedly pings the endpoint until the criteria are met or a timeout is reached. This makes it ideal for waiting for an API to become available, for a specific resource to be created, or for a process to complete on a remote server.
+
+**Key Parameters of HttpSensor**
+
+To effectively use the HttpSensor, it's crucial to understand its key parameters:
+
+- **task_id (str)**: A unique identifier for the sensor task within the DAG.
+- **http_conn_id (str)**: The Airflow connection ID that stores the connection details (host, schema, login, password, etc.) for the HTTP endpoint. This allows you to manage your connection details centrally and securely.
+- **endpoint (str)**: The URL endpoint to which the sensor will send the HTTP request. This is appended to the base URL defined in the http_conn_id.
+- **method (str)**: The HTTP method to use (e.g., 'GET', 'POST', 'HEAD', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'). Defaults to 'GET'.
+- **request_params (dict): A dictionary of query string parameters to be added to the request.
+- **headers (dict)**: A dictionary of HTTP headers to be sent with the request.
+- **response_check (callable)**: A callable (a Python function) that takes the HTTP response object as input and returns True if the response meets the desired criteria, and False otherwise. This is where you define the logic for determining whether the sensor should succeed or continue polling.
+- **extra_options (dict)**: Extra options for the 'requests' library, such as SSL verification settings or timeout values.
+- **poke_interval (float)**: The number of seconds to wait between pokes (i.e., HTTP requests).
+- **timeout (float)**: The maximum amount of time, in seconds, that the sensor will wait for the condition to be met. After this time, the sensor will fail.
+
+**Example: Checking for a 200 OK Response**
+
+The most basic use case for HttpSensor is to check if an API endpoint is available and returning a 200 OK status code. Here's how you can achieve this:
+
+```py
+from airflow import DAG
+from airflow.providers.http.sensors.http import HttpSensor
+from datetime import datetime
+
+with DAG(
+    dag_id='http_sensor_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define the HttpSensor
+    check_api = HttpSensor(
+        task_id='check_api_availability',
+        http_conn_id='my_http_connection',  # Replace with your connection ID
+        endpoint='/api/health',  # Replace with your API endpoint
+        poke_interval=5,  # Check every 5 seconds
+        timeout=60  # Timeout after 60 seconds
+    )
+```
+
+In this example:
+
+- http_conn_id refers to an Airflow connection named my_http_connection. You need to create this connection in the Airflow UI, specifying the base URL of the API.
+- endpoint is set to /api/health, which is the specific endpoint we want to check.
+- poke_interval is set to 5 seconds, meaning the sensor will check the API every 5 seconds.
+- timeout is set to 60 seconds, meaning the sensor will fail if the API is not available within 60 seconds.
+
+By default, HttpSensor uses the GET method and considers a 200 OK response as success.
+
+**Example: Using response_check for Custom Validation**
+
+The real power of HttpSensor lies in the response_check parameter. This allows you to define custom logic for validating the API response. For example, you might want to check if the response contains specific data or if a certain field has a particular value.
+
+```py
+from airflow import DAG
+from airflow.providers.http.sensors.http import HttpSensor
+from datetime import datetime
+import json
+
+def check_api_response(response):
+    """
+    Checks if the API response contains the key 'status' with value 'ok'.
+    """
+    try:
+        data = response.json()
+        return data.get('status') == 'ok'
+    except json.JSONDecodeError:
+        return False  # Handle cases where the response is not valid JSON
+
+with DAG(
+    dag_id='http_sensor_response_check',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define the HttpSensor with response_check
+    check_api = HttpSensor(
+        task_id='check_api_response',
+        http_conn_id='my_http_connection',  # Replace with your connection ID
+        endpoint='/api/data',  # Replace with your API endpoint
+        poke_interval=5,
+        timeout=60,
+        response_check=check_api_response
+    )
+```
+
+In this example:
+
+- We define a function check_api_response that takes the HTTP response object as input.
+- Inside the function, we parse the response as JSON and check if the status key has the value ok.
+- The response_check parameter of the HttpSensor is set to this function.
+
+This sensor will now only succeed if the API returns a JSON response containing {"status": "ok"}.
+
+**Example: Using POST Method with Request Parameters and Headers**
+
+Sometimes, you need to use a different HTTP method (e.g., POST) and send request parameters or headers. Here's how to do it:
+
+```py
+from airflow import DAG
+from airflow.providers.http.sensors.http import HttpSensor
+from datetime import datetime
+
+with DAG(
+    dag_id='http_sensor_post_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    # Define the HttpSensor with POST method, request parameters, and headers
+    check_api = HttpSensor(
+        task_id='check_api_post',
+        http_conn_id='my_http_connection',  # Replace with your connection ID
+        endpoint='/api/process',  # Replace with your API endpoint
+        method='POST',
+        request_params={'param1': 'value1', 'param2': 'value2'},
+        headers={'Content-Type': 'application/json'},
+        poke_interval=5,
+        timeout=60
+    )
+```
+
+In this example:
+
+- method is set to POST.
+- request_params is a dictionary containing the parameters to be sent in the request body.
+- headers is a dictionary containing the HTTP headers to be sent with the request. Here, we set the Content-Type to application/json, indicating that we are sending JSON data.
 
 #### <a name="chapter6part3.2"></a>Chapter 6 - Part 3.2: Best Practices for Using HttpSensor
 
+- **Use Airflow Connections**: Always use Airflow connections to store your API credentials and base URLs. This makes your DAGs more secure and easier to manage.
+- **Set Realistic Timeouts**: Choose a timeout value that is appropriate for the API you are monitoring. Consider the API's expected response time and potential network latency.
+- **Implement Robust Error Handling**: In your response_check function, handle potential errors such as invalid JSON responses or unexpected status codes.
+- **Avoid Over-Polling**: Set the poke_interval to a reasonable value to avoid overwhelming the API with requests.
+- **Monitor Sensor Performance**: Keep an eye on the sensor's execution time and success rate. If the sensor is consistently timing out or taking a long time to complete, investigate the API's performance.
+- **Consider Idempotency**: If the API call triggers an action, ensure the API is idempotent or implement logic to prevent the action from being triggered multiple times due to sensor retries.
+
 #### <a name="chapter6part4"></a>Chapter 6 - Part 4: Creating Custom Sensors
+
+Creating custom sensors in Airflow allows you to monitor specific conditions tailored to your unique workflow requirements. Instead of relying solely on pre-built sensors, you can define your own logic to determine when a task should proceed. This provides greater flexibility and control over your DAG execution.
 
 #### <a name="chapter6part4.1"></a>Chapter 6 - Part 4.1: Understanding Custom Sensors
 
+Custom sensors are Python classes that inherit from Airflow's BaseSensorOperator. The core of a custom sensor is the poke method, which contains the logic to check for the desired condition. This method is repeatedly called by the sensor until it returns True, indicating that the condition is met.
+
+**Key Components of a Custom Sensor**
+
+- **Inheritance**: Your custom sensor class must inherit from airflow.sensors.base.BaseSensorOperator. This provides the necessary framework for Airflow to manage the sensor's lifecycle.
+- **poke Method**: This method contains the core logic of your sensor. It should return True when the desired condition is met, and False otherwise. The poke method is executed repeatedly at a defined interval.
+- **__init__ Method (Constructor)**: This method is used to initialize any parameters or configurations that your sensor needs. You should always call the super().__init__(**kwargs) method to properly initialize the base class.
+- **template_fields (Optional)**: If your sensor needs to use Jinja templating, you can define a template_fields attribute as a tuple of field names that should be rendered as Jinja templates.
+- **ui_color and ui_fgcolor (Optional)**: These attributes allow you to customize the appearance of your sensor in the Airflow UI.
+
+**Example: Simple Custom Sensor**
+
+Here's a basic example of a custom sensor that checks if a specific value exists in a list:
+
+```py
+from airflow.sensors.base import BaseSensorOperator
+from airflow.utils.decorators import apply_defaults
+
+class ValueInListSensor(BaseSensorOperator):
+    """
+    Checks if a specific value exists in a list.
+    """
+    template_fields = ('value_to_check', 'list_to_check')
+
+    @apply_defaults
+    def __init__(self,
+                 value_to_check: str,
+                 list_to_check: list,
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.value_to_check = value_to_check
+        self.list_to_check = list_to_check
+
+    def poke(self, context):
+        self.log.info(f"Checking if {self.value_to_check} is in {self.list_to_check}")
+        return self.value_to_check in self.list_to_check
+```
+
+**Explanation:**
+
+- ValueInListSensor inherits from BaseSensorOperator.
+- template_fields = ('value_to_check', 'list_to_check') allows value_to_check and list_to_check to be Jinja templated.
+- The __init__ method initializes the value_to_check and list_to_check attributes. The @apply_defaults decorator is used to properly handle default values for parameters.
+- The poke method checks if value_to_check is present in list_to_check and returns True if it is, and False otherwise. It also logs the check being performed.
+
+**Example: Using the Custom Sensor in a DAG**
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+from custom_sensors import ValueInListSensor  # Assuming the sensor is in a file named custom_sensors.py
+
+with DAG(
+    dag_id='custom_sensor_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+    
+    check_value = ValueInListSensor(
+        task_id='check_if_value_exists',
+        value_to_check='banana',
+        list_to_check=['apple', 'banana', 'cherry'],
+        poke_interval=5  # Check every 5 seconds
+    )
+
+    print_message = BashOperator(
+        task_id='print_message',
+        bash_command='echo "Value found in list!"'
+    )
+
+    check_value >> print_message
+```
+
+**Explanation:**
+
+- The DAG defines a ValueInListSensor task named check_if_value_exists.
+- The value_to_check parameter is set to 'banana', and list_to_check is set to ['apple', 'banana', 'cherry'].
+- poke_interval=5 specifies that the poke method should be called every 5 seconds.
+- The print_message task will only execute after the check_if_value_exists sensor returns True.
+
 #### <a name="chapter6part4.2"></a>Chapter 6 - Part 4.2: Advanced Custom Sensors
+
+**Using Hooks within Sensors**
+
+Sensors often need to interact with external systems. Airflow Hooks provide a convenient way to do this. You can use Hooks within your custom sensors to connect to databases, APIs, cloud services, and more.
+
+**Example: Custom Sensor with a Database Hook**
+
+Let's create a sensor that checks if a specific record exists in a PostgreSQL database table.
+
+```py
+from airflow.sensors.base import BaseSensorOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.utils.decorators import apply_defaults
+
+class PostgresRecordSensor(BaseSensorOperator):
+    """
+    Checks if a record exists in a PostgreSQL table.
+    """
+
+    @apply_defaults
+    def __init__(self,
+                 postgres_conn_id: str,
+                 table: str,
+                 condition: str,
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.postgres_conn_id = postgres_conn_id
+        self.table = table
+        self.condition = condition
+
+    def poke(self, context):
+        hook = PostgresHook(postgres_conn_id=self.postgres_conn_id)
+        sql = f"SELECT COUNT(*) FROM {self.table} WHERE {self.condition}"
+        record_count = hook.get_first(sql)[0]
+        self.log.info(f"Record count: {record_count}")
+        return record_count > 0
+```
+
+**Explanation:**
+
+- PostgresRecordSensor inherits from BaseSensorOperator.
+- The __init__ method takes postgres_conn_id, table, and condition as parameters. postgres_conn_id refers to the Airflow connection ID for the PostgreSQL database.
+- The poke method creates a PostgresHook instance using the provided connection ID.
+- It constructs a SQL query to count the number of records in the specified table that match the given condition.
+- It executes the query using hook.get_first(sql) and checks if the record count is greater than 0.
+
+**Example: Using the Database Sensor in a DAG**
+
+Before using this sensor, you need to configure a PostgreSQL connection in Airflow with the connection ID specified in the DAG.
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+from custom_sensors import PostgresRecordSensor
+
+with DAG(
+    dag_id='postgres_sensor_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+
+    check_record = PostgresRecordSensor(
+        task_id='check_postgres_record',
+        postgres_conn_id='my_postgres_connection',
+        table='users',
+        condition="status = 'active'",
+        poke_interval=10
+    )
+
+    process_data = BashOperator(
+        task_id='process_data',
+        bash_command='echo "Processing data..."'
+    )
+
+    check_record >> process_data
+```
+
+**Explanation:**
+
+- The DAG defines a PostgresRecordSensor task named check_postgres_record.
+- postgres_conn_id is set to 'my_postgres_connection', which should match the ID of your PostgreSQL connection in Airflow.
+- table is set to 'users', and condition is set to "status = 'active'".
+- The process_data task will only execute after the check_postgres_record sensor finds at least one active user in the users table.
+
+**Handling Timeouts and Retries**
+
+Custom sensors, like other Airflow operators, support timeouts and retries. You can configure these parameters in the DAG definition to handle situations where the sensor takes too long to complete or encounters temporary errors.
+
+- **timeout**: Specifies the maximum amount of time (in seconds) that the sensor should wait for the condition to be met. If the timeout is reached, the sensor task will fail.
+- **retries**: Specifies the number of times the sensor should retry if it fails.
+- **retry_delay**: Specifies the delay (in seconds) between retries.
+
+**Example: Configuring Timeouts and Retries**
+
+```py
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+from custom_sensors import ValueInListSensor
+
+with DAG(
+    dag_id='custom_sensor_timeout_retry_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+
+    check_value = ValueInListSensor(
+        task_id='check_if_value_exists',
+        value_to_check='banana',
+        list_to_check=['apple'],  # 'banana' is not in the list initially
+        poke_interval=5,
+        timeout=30,  # Timeout after 30 seconds
+        retries=3,  # Retry 3 times
+        retry_delay=10  # Wait 10 seconds between retries
+    )
+
+    print_message = BashOperator(
+        task_id='print_message',
+        bash_command='echo "Value found in list!"'
+    )
+
+    check_value >> print_message
+```
+
+In this example, the check_if_value_exists sensor will wait for a maximum of 30 seconds for 'banana' to appear in the list. If it doesn't appear within that time, the sensor will fail. It will then retry the sensor 3 times, waiting 10 seconds between each retry.
+
+**Using context in Sensors**
+
+The poke method receives a context dictionary as an argument. This dictionary contains information about the current task instance, DAG run, and Airflow environment. You can use the context to access XComs, variables, and other relevant data.
+
+**Example: Accessing XComs in a Sensor**
+
+Let's say you have a task that pushes a list to XCom, and you want a sensor to wait until a specific value appears in that list.
+
+```py
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.sensors.base import BaseSensorOperator
+from airflow.utils.decorators import apply_defaults
+from datetime import datetime
+
+def push_to_xcom():
+    return ['apple', 'cherry']
+
+class XComValueSensor(BaseSensorOperator):
+    """
+    Checks if a specific value exists in an XCom variable.
+    """
+
+    @apply_defaults
+    def __init__(self,
+                 xcom_task_id: str,
+                 value_to_check: str,
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.xcom_task_id = xcom_task_id
+        self.value_to_check = value_to_check
+
+    def poke(self, context):
+        ti = context['ti']
+        list_from_xcom = ti.xcom_pull(task_ids=self.xcom_task_id)
+        self.log.info(f"Checking if {self.value_to_check} is in XCom from task {self.xcom_task_id}: {list_from_xcom}")
+        return self.value_to_check in list_from_xcom
+
+with DAG(
+    dag_id='xcom_sensor_example',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval=None,
+    catchup=False
+) as dag:
+
+    push_task = PythonOperator(
+        task_id='push_list_to_xcom',
+        python_callable=push_to_xcom
+    )
+
+    check_xcom = XComValueSensor(
+        task_id='check_xcom_value',
+        xcom_task_id='push_list_to_xcom',
+        value_to_check='cherry',
+        poke_interval=5
+    )
+
+    print_message = BashOperator(
+        task_id='print_message',
+        bash_command='echo "Value found in XCom!"'
+    )
+
+    push_task >> check_xcom >> print_message
+```
+
+**Explanation:**
+
+- The push_list_to_xcom task pushes a list ['apple', 'cherry'] to XCom.
+- The XComValueSensor task checks if 'cherry' is present in the list retrieved from XCom.
+- In the poke method, ti = context['ti'] retrieves the TaskInstance object from the context.
+- ti.xcom_pull(task_ids=self.xcom_task_id) retrieves the XCom value pushed by the push_list_to_xcom task.
 
 #### <a name="chapter6part4.3"></a>Chapter 6 - Part 4.3: Best Practices for Custom Sensors
 
+- **Keep the poke method lightweight**: The poke method should execute quickly to avoid blocking the Airflow scheduler. If you need to perform complex operations, consider offloading them to a separate process or using an asynchronous approach.
+- **Use appropriate poke_interval**: The poke_interval parameter determines how often the poke method is called. Choose an interval that is appropriate for the condition you are monitoring. A shorter interval will result in more frequent checks, while a longer interval may delay the execution of downstream tasks.
+- **Implement proper error handling**: Your sensor should handle potential errors gracefully. Use try...except blocks to catch exceptions and log informative error messages.
+- **Use Airflow Hooks**: Leverage Airflow Hooks to interact with external systems. Hooks provide a consistent and reliable way to connect to databases, APIs, and other services.
+- **Consider Idempotency**: Ensure your sensor logic is idempotent, meaning that it can be executed multiple times without causing unintended side effects. This is important because the poke method may be called repeatedly, especially in the event of retries.
+- **Document your sensors**: Provide clear and concise documentation for your custom sensors, including a description of their purpose, parameters, and expected behavior.
+
 #### <a name="chapter6part4.4"></a>Chapter 6 - Part 4.4: Real-World Application
+
+Consider a data pipeline that processes customer orders. You might create a custom sensor to monitor a message queue for new order notifications. The sensor would check the queue periodically and return True when a new order is available. This would trigger the downstream tasks in the DAG to process the order.
 
 #### <a name="chapter6part5"></a>Chapter 6 - Part 5: Best practices for using Sensors
 
+Airflow sensors are powerful tools for creating data pipelines that react to external triggers. However, using them effectively requires careful consideration to avoid common pitfalls like resource exhaustion and DAG unreliability. This lesson will cover best practices for using sensors, including strategies for optimizing performance, handling failures, and ensuring your DAGs remain robust and efficient. We'll explore techniques for setting appropriate timeouts, using smart deferral, and implementing effective error handling to build reliable and scalable Airflow workflows.
+
 #### <a name="chapter6part5.1"></a>Chapter 6 - Part 5.1: Sensor Timeouts and Failure Modes
+
+One of the most critical aspects of using sensors is configuring appropriate timeouts. A sensor that waits indefinitely can stall your DAG and consume resources unnecessarily. Understanding the different failure modes and how to handle them is crucial for building resilient pipelines.
+
+**Setting Timeouts**
+
+The timeout parameter in a sensor defines the maximum amount of time the sensor will wait for the condition to be met. If the timeout is reached, the sensor will fail. It's essential to set a timeout that is long enough to allow for legitimate delays but short enough to prevent indefinite blocking.
+
+Example: Imagine you're using a FileSensor to wait for a file to arrive in an S3 bucket. You expect the file to be uploaded within 15 minutes.
+
+```py
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
+from airflow import DAG
+from airflow.utils.dates import days_ago
+
+with DAG(
+    dag_id='s3_file_sensor_with_timeout',
+    start_date=days_ago(1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example'],
+) as dag:
+    wait_for_file = S3KeySensor(
+        task_id='wait_for_s3_file',
+        bucket_key='path/to/my_file.txt',
+        bucket_name='my-s3-bucket',
+        aws_conn_id='aws_default',
+        timeout=60 * 15,  # 15 minutes in seconds
+    )
+```
+
+In this example, the timeout is set to 900 seconds (15 minutes). If the file doesn't arrive within this time, the sensor will fail, and the DAG will proceed based on the defined failure handling.
+
+**Understanding Failure Modes**
+
+Sensors can fail for various reasons:
+
+- **Timeout**: The sensor waits longer than the specified timeout period.
+- **False Positive**: The sensor incorrectly reports that the condition is met. This is rare but can happen due to network issues or inconsistencies in the external system.
+- **False Negative**: The sensor incorrectly reports that the condition is not met. This can occur due to temporary unavailability of the external system or permission issues.
+- **Unexpected Errors**: The sensor encounters an unexpected error, such as a network connection error or an API error.
+
+**Handling Sensor Failures**
+
+There are several ways to handle sensor failures:
+
+- **Retries**: Configure the sensor to retry a certain number of times before failing. This can help to mitigate transient errors.
+- **on_failure_callback**: Define a callback function that will be executed when the sensor fails. This can be used to send an alert or trigger a recovery process.
+- **soft_fail**: Set soft_fail=True to mark the task as skipped instead of failed. This allows the DAG to continue running even if the sensor fails.
+- **Branching**: Use a BranchPythonOperator to branch the DAG based on the success or failure of the sensor. This allows you to define different execution paths for different scenarios.
+
+Example: Using on_failure_callback to send an email notification when a sensor fails.
+
+```py
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
+from airflow import DAG
+from airflow.operators.email import EmailOperator
+from airflow.utils.dates import days_ago
+
+def failure_callback(context):
+    return EmailOperator(
+        task_id='send_email_on_failure',
+        to='alerts@example.com',
+        subject='Sensor Failed',
+        html_content=f"Task {context['task_instance'].task_id} failed in DAG {context['dag'].dag_id}",
+    ).execute(context=context)
+
+with DAG(
+    dag_id='s3_file_sensor_with_failure_callback',
+    start_date=days_ago(1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example'],
+) as dag:
+    wait_for_file = S3KeySensor(
+        task_id='wait_for_s3_file',
+        bucket_key='path/to/my_file.txt',
+        bucket_name='my-s3-bucket',
+        aws_conn_id='aws_default',
+        timeout=60 * 15,  # 15 minutes in seconds
+        on_failure_callback=failure_callback,
+    )
+```
+
+In this example, if the S3KeySensor fails, the failure_callback function will be executed, which sends an email notification to alerts@example.com.
 
 #### <a name="chapter6part5.2"></a>Chapter 6 - Part 5.2: Sensor Modes: Poke vs. Deferrable
 
+Airflow sensors operate in different modes that affect how they consume resources. Understanding these modes and choosing the right one for your use case is crucial for optimizing performance.
+
+**Poke Mode (Default)**
+
+In poke mode, the sensor repeatedly executes its poke() method at a defined interval (specified by the poke_interval parameter) until the condition is met or the timeout is reached. This mode consumes worker resources continuously while the sensor is running.
+
+Example: A HttpSensor in poke mode checks the status code of a website every 60 seconds.
+
+```py
+from airflow.providers.http.sensors.http import HttpSensor
+from airflow import DAG
+from airflow.utils.dates import days_ago
+
+with DAG(
+    dag_id='http_sensor_poke_mode',
+    start_date=days_ago(1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example'],
+) as dag:
+    check_website = HttpSensor(
+        task_id='check_website_status',
+        http_conn_id='my_http_connection',
+        endpoint='/',
+        request_params={},
+        response_check=lambda response: response.status_code == 200,
+        poke_interval=60,  # Check every 60 seconds
+    )
+```
+
+In this example, the HttpSensor will send a request to the specified endpoint every 60 seconds until the response status code is 200 or the timeout is reached. While waiting, the worker slot is occupied.
+
+**Deferrable Mode**
+
+Deferrable mode (introduced in Airflow 2) allows sensors to release the worker slot while waiting for the condition to be met. Instead of continuously poking, the sensor defers its execution to a triggerer, which is a separate process that monitors the external system. When the condition is met, the triggerer signals the sensor to resume execution. This mode significantly reduces resource consumption and improves the scalability of Airflow.
+
+Example: Using HttpSensor in deferrable mode.
+
+```py
+from airflow.providers.http.sensors.http import HttpSensor
+from airflow import DAG
+from airflow.utils.dates import days_ago
+
+with DAG(
+    dag_id='http_sensor_deferrable_mode',
+    start_date=days_ago(1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example'],
+) as dag:
+    check_website = HttpSensor(
+        task_id='check_website_status',
+        http_conn_id='my_http_connection',
+        endpoint='/',
+        request_params={},
+        response_check=lambda response: response.status_code == 200,
+        deferrable=True,
+    )
+```
+
+In this example, setting deferrable=True enables deferrable mode. The sensor will release the worker slot and a triggerer will monitor the website status. When the status code is 200, the triggerer will signal the sensor to resume execution and the DAG will continue.
+
+**Choosing the Right Mode**
+
+- **Poke Mode**: Suitable for sensors that need to check frequently and have short wait times. Also, poke mode is suitable when triggerers are not available or the sensor is custom and doesn't support deferral.
+- **Deferrable Mode**: Ideal for sensors that have long wait times or need to monitor external systems that can be efficiently monitored by a triggerer. This mode is highly recommended for production environments to reduce resource consumption.
+
+Considerations:
+
+Deferrable mode requires a triggerer to be configured and running in your Airflow environment.
+Not all sensors support deferrable mode. Check the documentation for the specific sensor you are using.
+Deferrable mode might add some complexity to your Airflow setup, but the benefits in terms of resource efficiency are often worth it.
+
 #### <a name="chapter6part5.3"></a>Chapter 6 - Part 5.3: Optimizing Sensor Performance
 
+Beyond choosing the right mode, there are other techniques you can use to optimize sensor performance.
+
+**Adjusting poke_interval**
+
+The poke_interval parameter determines how often the sensor checks for the condition to be met. Setting this value too low can lead to excessive resource consumption and unnecessary load on the external system. Setting it too high can delay the execution of downstream tasks.
+
+- **Consider the frequency of updates in the external system**: If the external system is updated frequently, you can set a lower poke_interval. If updates are infrequent, you can set a higher poke_interval.
+- **Balance resource consumption and responsiveness**: Experiment with different values to find a balance between resource consumption and responsiveness.
+- **Use different poke_interval values for different sensors**: Some sensors may need to check more frequently than others.
+
+Example: Adjusting poke_interval for a TimeSensor.
+
+```py
+from airflow.sensors.time_sensor import TimeSensor
+from airflow import DAG
+from airflow.utils.dates import days_ago
+import datetime
+
+with DAG(
+    dag_id='time_sensor_poke_interval',
+    start_date=days_ago(1),
+    schedule_interval=None,
+    catchup=False,
+    tags=['example'],
+) as dag:
+    wait_for_time = TimeSensor(
+        task_id='wait_for_specific_time',
+        target_time=datetime.time(10, 0, 0),  # Wait for 10:00 AM
+        poke_interval=60 * 5,  # Check every 5 minutes
+    )
+```
+
+In this example, the TimeSensor will check every 5 minutes to see if the current time is 10:00 AM.
+
+**Using Exponential Backoff**
+
+When a sensor fails to connect to an external system or encounters a temporary error, it can be helpful to use exponential backoff. This means that the sensor will wait for an increasing amount of time between retries. This can help to avoid overwhelming the external system and give it time to recover.
+
+While Airflow doesn't have built-in exponential backoff for sensors directly, you can implement it using a custom sensor or by wrapping an existing sensor in a retry decorator.
+
+Example: Implementing exponential backoff using a custom sensor.
+
+```py
+from airflow.sensors.base import BaseSensorOperator
+from airflow.utils.decorators import apply_defaults
+import time
+import random
+
+class ExponentialBackoffSensor(BaseSensorOperator):
+    """
+    A sensor that uses exponential backoff when polling.
+    """
+    template_fields = ['poke_context']
+
+    @apply_defaults
+    def __init__(self,
+                 poke_function,
+                 poke_context=None,
+                 min_interval=1,
+                 max_interval=60,
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.poke_function = poke_function
+        self.poke_context = poke_context or {}
+        self.min_interval = min_interval
+        self.max_interval = max_interval
+        self.current_interval = min_interval
+
+    def poke(self, context):
+        try:
+            return self.poke_function(self.poke_context)
+        except Exception as e:
+            self.log.warning(f"Poke failed: {e}. Waiting {self.current_interval} seconds before retrying.")
+            time.sleep(self.current_interval)
+            # Exponential backoff with jitter
+            self.current_interval = min(self.current_interval * 2 * (1 + random.random() * 0.1), self.max_interval)
+            return False
+```
+
+To use this sensor, you would define a poke_function that checks the condition you are waiting for. The min_interval and max_interval parameters control the minimum and maximum wait times between retries.
+
+**Optimizing Sensor Logic**
+
+The logic within the poke() method of a sensor should be as efficient as possible. Avoid performing unnecessary computations or making expensive API calls.
+
+- **Cache results**: If the sensor needs to retrieve data from an external system, cache the results to avoid making repeated calls.
+- **Use efficient data structures**: Use appropriate data structures to store and process data.
+- **Minimize network traffic**: Reduce the amount of data that needs to be transferred over the network.
+- **Use asynchronous operations**: If possible, use asynchronous operations to avoid blocking the main thread.
+
 #### <a name="chapter6part5.4"></a>Chapter 6 - Part 5.4: Best Practices for Sensor Design
+
+When creating custom sensors, follow these best practices to ensure they are reliable and maintainable.
+
+**Idempotency**
+
+Ensure that your sensor's poke() method is idempotent. This means that it should produce the same result regardless of how many times it is executed. This is important because Airflow may retry the poke() method multiple times, especially in poke mode.
+
+**Clear Logging**
+
+Include clear and informative logging in your sensor's poke() method. This will help you to debug issues and understand how the sensor is behaving.
+
+**Error Handling**
+
+Implement robust error handling in your sensor's poke() method. Catch any exceptions that may occur and log them appropriately. Consider using retry logic to handle transient errors.
+
+**Testability**
+
+Write unit tests for your sensor to ensure that it is working correctly. This will help you to catch bugs early and prevent them from causing problems in production.
+
+**Documentation**
+
+Document your sensor clearly and concisely. Explain what it does, how it works, and how to use it. This will make it easier for others to understand and use your sensor.
 
 ## <a name="chapter7"></a>Chapter 7: Deploying Airflow to Production
 
